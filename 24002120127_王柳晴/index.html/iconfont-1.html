@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>字体图标馆 | Font Awesome | WLQ·ATELIER</title>
+    <!-- 本地 CDN：Font Awesome 字体图标 -->
+    <link rel="stylesheet" href="./cdn/fontawesome/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --wlq_ink: #1b1310;
+            --wlq_paper: #f8f1e4;
+            --wlq_cream: #fffaef;
+            --wlq_vermilion: #ff6347;
+            --wlq_amber: #ff8c00;
+            --wlq_moss: #2e8b57;
+            --wlq_grad: linear-gradient(135deg, var(--wlq_vermilion), var(--wlq_amber));
+            --wlq_display_font: Georgia, "Times New Roman", "STZhongsong", "KaiTi", serif;
+            --wlq_body_font: "Segoe UI", "Microsoft YaHei", sans-serif;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        body {
+            background: var(--wlq_paper);
+            color: var(--wlq_ink);
+            font-family: var(--wlq_body_font);
+            background-image: radial-gradient(rgba(27, 19, 16, .05) 1px, transparent 1px);
+            background-size: 22px 22px;
+            overflow-x: hidden;
+        }
+
+        @keyframes wlq_fade_up {
+            from { opacity: 0; transform: translateY(26px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============ 顶部导航（flex） ============ */
+        .wlq_nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--wlq_ink);
+            color: var(--wlq_cream);
+            padding: 14px 4vw;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 3px solid var(--wlq_vermilion);
+        }
+
+        .wlq_logo {
+            font-family: var(--wlq_display_font);
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .wlq_logo em {
+            font-style: normal;
+            background: var(--wlq_grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .wlq_nav_list { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+        .wlq_nav_list a {
+            color: var(--wlq_cream);
+            font-size: 15px;
+            padding: 9px 16px;
+            border-radius: 999px;
+            transition: background .25s;
+        }
+
+        .wlq_nav_list a:hover { background: rgba(255, 250, 239, .16); }
+
+        .wlq_nav_list a.wlq_home_entry {
+            background: var(--wlq_grad);
+            color: #fff;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ============ 页头 ============ */
+        .wlq_hero {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 64px 24px 40px;
+            animation: wlq_fade_up .8s ease both;
+        }
+
+        .wlq_hero_kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            letter-spacing: 5px;
+            padding: 6px 14px;
+            border: 1.5px solid var(--wlq_ink);
+            border-radius: 999px;
+            margin-bottom: 20px;
+        }
+
+        .wlq_hero h1 {
+            font-family: var(--wlq_display_font);
+            font-size: clamp(38px, 6vw, 66px);
+            letter-spacing: 2px;
+            line-height: 1.12;
+        }
+
+        .wlq_hero h1 span {
+            background: var(--wlq_grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-style: italic;
+        }
+
+        .wlq_hero p {
+            margin-top: 16px;
+            max-width: 62ch;
+            font-size: 16px;
+            line-height: 1.95;
+            color: #5c4a3d;
+        }
+
+        .wlq_hero p code {
+            background: var(--wlq_ink);
+            color: var(--wlq_amber);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        /* ============ 用法代码卡 ============ */
+        .wlq_usage {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            max-width: 1100px;
+            margin: 26px auto 0;
+            padding: 0 24px;
+        }
+
+        .wlq_code_card {
+            flex: 1 1 340px;
+            background: var(--wlq_ink);
+            color: #e8dcc8;
+            border-radius: 16px;
+            padding: 22px 24px;
+            border: 2px solid var(--wlq_ink);
+            box-shadow: 6px 6px 0 rgba(255, 99, 71, .8);
+            animation: wlq_fade_up .8s .1s ease both;
+        }
+
+        .wlq_code_card h4 {
+            color: var(--wlq_amber);
+            font-size: 14px;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+        }
+
+        .wlq_code_card pre {
+            font-family: Consolas, Monaco, monospace;
+            font-size: 14px;
+            line-height: 1.9;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .wlq_code_card .wlq_tag { color: #7ec699; }
+        .wlq_code_card .wlq_cls { color: #ffb366; }
+
+        /* ============ 图标展区通用 ============ */
+        .wlq_zone {
+            max-width: 1100px;
+            margin: 58px auto 0;
+            padding: 0 24px;
+        }
+
+        .wlq_zone_title {
+            font-family: var(--wlq_display_font);
+            font-size: 30px;
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+            margin-bottom: 8px;
+        }
+
+        .wlq_zone_title i { color: var(--wlq_vermilion); }
+
+        .wlq_zone_title small {
+            font-size: 13px;
+            letter-spacing: 3px;
+            color: #8a7360;
+        }
+
+        .wlq_zone_tip {
+            font-size: 14px;
+            color: #6b584a;
+            margin-bottom: 20px;
+        }
+
+        .wlq_icon_grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .wlq_icon_cell {
+            flex: 0 0 calc((100% - 14px * 5) / 6);
+            min-width: 130px;
+            background: var(--wlq_cream);
+            border: 2px solid var(--wlq_ink);
+            border-radius: 14px;
+            padding: 20px 10px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform .22s, box-shadow .22s, background .22s;
+        }
+
+        .wlq_icon_cell:hover {
+            transform: translateY(-5px) rotate(-1.2deg);
+            box-shadow: 0 12px 26px rgba(27, 19, 16, .16);
+            background: #fff;
+        }
+
+        .wlq_icon_cell i {
+            font-size: 34px;
+            background: var(--wlq_grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .wlq_icon_cell:hover i {
+            background: none;
+            color: var(--wlq_vermilion);
+            -webkit-text-fill-color: currentColor;
+        }
+
+        .wlq_icon_cell b {
+            display: block;
+            margin-top: 10px;
+            font-size: 12px;
+            font-weight: normal;
+            color: #6b584a;
+            word-break: break-all;
+        }
+
+        /* 字号标尺 */
+        .wlq_scale {
+            display: flex;
+            align-items: flex-end;
+            gap: 34px;
+            flex-wrap: wrap;
+            background: var(--wlq_cream);
+            border: 2px solid var(--wlq_ink);
+            border-radius: 16px;
+            padding: 26px 30px 18px;
+            box-shadow: 6px 6px 0 var(--wlq_ink);
+        }
+
+        .wlq_scale_item { text-align: center; }
+
+        .wlq_scale_item i { color: var(--wlq_ink); }
+
+        .wlq_scale_item b {
+            display: block;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #8a7360;
+            font-weight: normal;
+        }
+
+        /* 动效舞台 */
+        .wlq_stage {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .wlq_stage_cell {
+            flex: 1 1 140px;
+            background: var(--wlq_cream);
+            border: 2px solid var(--wlq_ink);
+            border-radius: 14px;
+            padding: 24px 10px 18px;
+            text-align: center;
+            transition: transform .22s;
+        }
+
+        .wlq_stage_cell:hover { transform: translateY(-4px); }
+
+        .wlq_stage_cell i {
+            font-size: 36px;
+            color: var(--wlq_vermilion);
+        }
+
+        .wlq_stage_cell:nth-child(2n) i { color: var(--wlq_moss); }
+        .wlq_stage_cell:nth-child(3n) i { color: var(--wlq_amber); }
+
+        .wlq_stage_cell b {
+            display: block;
+            margin-top: 12px;
+            font-size: 12.5px;
+            font-weight: normal;
+            color: #6b584a;
+        }
+
+        /* ============ 页脚 ============ */
+        .wlq_footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            max-width: 1100px;
+            margin: 76px auto 0;
+            padding: 26px 24px 40px;
+            border-top: 2px dashed rgba(27, 19, 16, .35);
+            font-size: 14px;
+            color: #6b584a;
+        }
+
+        .wlq_footer strong {
+            font-family: var(--wlq_display_font);
+            font-size: 18px;
+            color: var(--wlq_ink);
+        }
+
+        /* 复制成功气泡 */
+        .wlq_toast {
+            position: fixed;
+            left: 50%;
+            bottom: 34px;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--wlq_ink);
+            color: var(--wlq_paper);
+            padding: 12px 26px;
+            border-radius: 999px;
+            font-size: 14px;
+            box-shadow: 0 12px 30px rgba(27, 19, 16, .35);
+            opacity: 0;
+            transition: transform .3s, opacity .3s;
+            z-index: 99;
+            pointer-events: none;
+        }
+
+        .wlq_toast.wlq_show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 900px) {
+            .wlq_icon_cell { flex-basis: calc((100% - 14px * 3) / 4); }
+        }
+
+        @media (max-width: 560px) {
+            .wlq_icon_cell { flex-basis: calc((100% - 14px) / 2); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 学号：24002120127 姓名：王柳晴 -->
+
+    <nav class="wlq_nav">
+        <a href="index.html" class="wlq_logo">WLQ<em>·ATELIER</em></a>
+        <ul class="wlq_nav_list">
+            <!-- 超链接入口：返回首页 index.html -->
+            <li><a class="wlq_home_entry" href="index.html"><i class="fa-solid fa-house"></i>返回首页</a></li>
+            <li><a href="iconfont-2.html">矢量图标馆 →</a></li>
+        </ul>
+    </nav>
+
+    <header class="wlq_hero">
+        <span class="wlq_hero_kicker"><i class="fa-solid fa-font"></i> GALLERY 01 · FONT ICONS</span>
+        <h1>字体图标馆：<br><span>图标即字形</span>。</h1>
+        <p>
+            Font Awesome 以 <code>@font-face</code> 加载字库，每个图标都是一枚字符：用 <code>fa-solid</code> 指定字族，再用 <code>fa-xxx</code> 指定码位，
+            浏览器便像渲染文字一样渲染图形。因此它继承了文字的一切天赋——任意缩放不模糊、<code>color</code> 直接染色、<code>font-size</code> 即尺寸。
+            点击下方任意图标，可复制它的类名。
+        </p>
+    </header>
+
+    <section class="wlq_usage">
+        <div class="wlq_code_card">
+            <h4>USAGE · 用法</h4>
+            <pre>&lt;<span class="wlq_tag">link</span> rel=<span class="wlq_cls">"stylesheet"</span>
+      href=<span class="wlq_cls">"./cdn/fontawesome/css/all.min.css"</span>&gt;
+
+&lt;<span class="wlq_tag">i</span> class=<span class="wlq_cls">"fa-solid fa-palette"</span>&gt;&lt;/<span class="wlq_tag">i</span>&gt;
+&lt;<span class="wlq_tag">i</span> class=<span class="wlq_cls">"fa-solid fa-pen-nib fa-beat"</span>&gt;&lt;/<span class="wlq_tag">i</span>&gt;
+
+/* 本质是一段字体编码 */
+.fa-palette::before {
+    content: "\f5fc";   /* 码位 */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+}</pre>
+        </div>
+        <div class="wlq_code_card">
+            <h4>SCALE · 字号即图标尺寸</h4>
+            <div class="wlq_scale">
+                <span class="wlq_scale_item"><i class="fa-solid fa-palette" style="font-size:16px"></i><b>16px</b></span>
+                <span class="wlq_scale_item"><i class="fa-solid fa-palette" style="font-size:24px"></i><b>24px</b></span>
+                <span class="wlq_scale_item"><i class="fa-solid fa-palette" style="font-size:34px"></i><b>34px</b></span>
+                <span class="wlq_scale_item"><i class="fa-solid fa-palette" style="font-size:48px"></i><b>48px</b></span>
+                <span class="wlq_scale_item"><i class="fa-solid fa-palette" style="font-size:66px"></i><b>66px</b></span>
+                <span class="wlq_scale_item"><i class="fa-solid fa-palette" style="font-size:88px"></i><b>88px</b></span>
+            </div>
+        </div>
+    </section>
+
+    <section class="wlq_zone">
+        <h2 class="wlq_zone_title"><i class="fa-solid fa-layer-group"></i>实心字体族 <small>SOLID / 900</small></h2>
+        <p class="wlq_zone_tip">字族 fa-solid，字重 900。最饱满的表现力，适合按钮与封面。</p>
+        <div class="wlq_icon_grid" id="wlq_solid_grid">
+            <div class="wlq_icon_cell"><i class="fa-solid fa-palette"></i><b>fa-palette</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-paintbrush"></i><b>fa-paintbrush</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-pen-nib"></i><b>fa-pen-nib</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-stamp"></i><b>fa-stamp</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-star"></i><b>fa-star</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-heart"></i><b>fa-heart</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-fire"></i><b>fa-fire</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-leaf"></i><b>fa-leaf</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-gem"></i><b>fa-gem</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-moon"></i><b>fa-moon</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-sun"></i><b>fa-sun</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-cloud-bolt"></i><b>fa-cloud-bolt</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-camera-retro"></i><b>fa-camera-retro</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-music"></i><b>fa-music</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-clapperboard"></i><b>fa-clapperboard</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-rocket"></i><b>fa-rocket</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-earth-asia"></i><b>fa-earth-asia</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-feather"></i><b>fa-feather</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-eye"></i><b>fa-eye</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-compass-drafting"></i><b>fa-compass-drafting</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-crow"></i><b>fa-crow</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-ghost"></i><b>fa-ghost</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-wand-magic-sparkles"></i><b>fa-wand-magic-sparkles</b></div>
+            <div class="wlq_icon_cell"><i class="fa-solid fa-mug-hot"></i><b>fa-mug-hot</b></div>
+        </div>
+    </section>
+
+    <section class="wlq_zone">
+        <h2 class="wlq_zone_title"><i class="fa-regular fa-bell"></i>常规字体族 <small>REGULAR / 400</small></h2>
+        <p class="wlq_zone_tip">字族 fa-regular，字重 400。线面平衡，适合列表与次要信息。</p>
+        <div class="wlq_icon_grid" id="wlq_regular_grid">
+            <div class="wlq_icon_cell"><i class="fa-regular fa-heart"></i><b>fa-heart</b></div>
+            <div class="wlq_icon_cell"><i class="fa-regular fa-star"></i><b>fa-star</b></div>
+            <div class="wlq_icon_cell"><i class="fa-regular fa-moon"></i><b>fa-moon</b></div>
+            <div class="wlq_icon_cell"><i class="fa-regular fa-sun"></i><b>fa-sun</b></div>
+            <div class="wlq_icon_cell"><i class="fa-regular fa-face-smile"></i><b>fa-face-smile</b></div>
+            <div class="wlq_icon_cell"><i class="fa-regular fa-bell"></i><b>fa-bell</b></div>
+            <div class="wlq_icon_cell"><i class="fa-regular fa-envelope"></i><b>fa-envelope</b></div>
+            <div class="wlq_icon_cell"><i class="fa-regular fa-bookmark"></i><b>fa-bookmark</b></div>
+            <div class="wlq_icon_cell"><i class="fa-regular fa-clock"></i><b>fa-clock</b></div>
+            <div class="wlq_icon_cell"><i class="fa-regular fa-image"></i><b>fa-image</b></div>
+            <div class="wlq_icon_cell"><i class="fa-regular fa-comment"></i><b>fa-comment</b></div>
+            <div class="wlq_icon_cell"><i class="fa-regular fa-floppy-disk"></i><b>fa-floppy-disk</b></div>
+        </div>
+    </section>
+
+    <section class="wlq_zone">
+        <h2 class="wlq_zone_title"><i class="fa-brands fa-figma"></i>品牌字体族 <small>BRANDS</small></h2>
+        <p class="wlq_zone_tip">字族 fa-brands，独立的品牌图形字库。</p>
+        <div class="wlq_icon_grid" id="wlq_brands_grid">
+            <div class="wlq_icon_cell"><i class="fa-brands fa-html5"></i><b>fa-html5</b></div>
+            <div class="wlq_icon_cell"><i class="fa-brands fa-css3-alt"></i><b>fa-css3-alt</b></div>
+            <div class="wlq_icon_cell"><i class="fa-brands fa-js"></i><b>fa-js</b></div>
+            <div class="wlq_icon_cell"><i class="fa-brands fa-github"></i><b>fa-github</b></div>
+            <div class="wlq_icon_cell"><i class="fa-brands fa-weibo"></i><b>fa-weibo</b></div>
+            <div class="wlq_icon_cell"><i class="fa-brands fa-qq"></i><b>fa-qq</b></div>
+            <div class="wlq_icon_cell"><i class="fa-brands fa-weixin"></i><b>fa-weixin</b></div>
+            <div class="wlq_icon_cell"><i class="fa-brands fa-node-js"></i><b>fa-node-js</b></div>
+            <div class="wlq_icon_cell"><i class="fa-brands fa-react"></i><b>fa-react</b></div>
+            <div class="wlq_icon_cell"><i class="fa-brands fa-figma"></i><b>fa-figma</b></div>
+            <div class="wlq_icon_cell"><i class="fa-brands fa-chrome"></i><b>fa-chrome</b></div>
+            <div class="wlq_icon_cell"><i class="fa-brands fa-android"></i><b>fa-android</b></div>
+        </div>
+    </section>
+
+    <section class="wlq_zone">
+        <h2 class="wlq_zone_title"><i class="fa-solid fa-clapperboard"></i>动效图标 <small>ANIMATION</small></h2>
+        <p class="wlq_zone_tip">Font Awesome 内置动画工具类，叠加在图标 class 上即可生效。</p>
+        <div class="wlq_stage">
+            <div class="wlq_stage_cell"><i class="fa-solid fa-spinner fa-spin"></i><b>fa-spin 旋转</b></div>
+            <div class="wlq_stage_cell"><i class="fa-solid fa-circle-notch fa-spin-pulse"></i><b>fa-spin-pulse</b></div>
+            <div class="wlq_stage_cell"><i class="fa-solid fa-heart fa-beat"></i><b>fa-beat 跳动</b></div>
+            <div class="wlq_stage_cell"><i class="fa-solid fa-arrow-down fa-bounce"></i><b>fa-bounce 弹跳</b></div>
+            <div class="wlq_stage_cell"><i class="fa-solid fa-eye fa-fade"></i><b>fa-fade 渐隐</b></div>
+            <div class="wlq_stage_cell"><i class="fa-solid fa-compact-disc fa-flip"></i><b>fa-flip 翻面</b></div>
+            <div class="wlq_stage_cell"><i class="fa-solid fa-bell fa-shake"></i><b>fa-shake 摇铃</b></div>
+        </div>
+    </section>
+
+    <footer class="wlq_footer">
+        <strong>WLQ·ATELIER</strong>
+        <span>字体图标馆 · Font Awesome Free 6.7.2（本地 cdn 目录）</span>
+        <span>学号 24002120127 · 王柳晴</span>
+    </footer>
+
+    <div class="wlq_toast" id="wlq_toast">已复制类名</div>
+
+    <script>
+        // 所有 JS 变量以 wlq_ 开头
+        var wlq_toast = document.getElementById("wlq_toast");
+        var wlq_timer = null;
+
+        // 点击图标单元 → 复制 <i> 的完整 class
+        var wlq_cells = document.querySelectorAll(".wlq_icon_cell");
+        for (var wlq_i = 0; wlq_i < wlq_cells.length; wlq_i++) {
+            wlq_cells[wlq_i].addEventListener("click", function () {
+                var wlq_icon = this.querySelector("i");
+                var wlq_text = "<i class=\"" + wlq_icon.className + "\"></i>";
+                wlq_copy(wlq_text);
+                wlq_showToast(wlq_text);
+            });
+        }
+
+        function wlq_copy(wlq_text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(wlq_text).catch(function () {});
+            } else {
+                var wlq_input = document.createElement("textarea");
+                wlq_input.value = wlq_text;
+                document.body.appendChild(wlq_input);
+                wlq_input.select();
+                document.execCommand("copy");
+                document.body.removeChild(wlq_input);
+            }
+        }
+
+        function wlq_showToast(wlq_text) {
+            wlq_toast.textContent = "已复制：" + wlq_text;
+            wlq_toast.classList.add("wlq_show");
+            if (wlq_timer) { clearTimeout(wlq_timer); }
+            wlq_timer = setTimeout(function () {
+                wlq_toast.classList.remove("wlq_show");
+            }, 1800);
+        }
+    </script>
+</body>
+
+</html>

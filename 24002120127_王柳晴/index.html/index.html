@@ -1,515 +1,556 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>王柳晴的《高级网页设计》课堂实践</title>
-  <style>
-    :root{
-      --bg1:#f5f7ff;
-      --bg2:#eef4ff;
-      --card:rgba(255,255,255,0.78);
-      --primary:#4f46e5;
-      --primary-2:#8b5cf6;
-      --primary-3:#06b6d4;
-      --text:#1f2937;
-      --muted:#667085;
-      --line:rgba(79,70,229,0.12);
-      --shadow:0 18px 48px rgba(79, 70, 229, 0.14);
-      --success:#10b981;
-      --warning:#f59e0b;
-      --danger:#ef4444;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WLQ·ATELIER | 首页 | 24002120127 王柳晴</title>
+    <style>
+        /* ============ 全局（延续 flex_css005.css 的全局写法） ============ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    *{ box-sizing:border-box; }
+        :root {
+            --wlq_ink: #1b1310;        /* 深咖墨色 */
+            --wlq_paper: #f8f1e4;      /* 暖纸色 */
+            --wlq_cream: #fffaef;      /* 奶油白 */
+            --wlq_vermilion: #ff6347;  /* 朱砂红（沿用原练习渐变色1） */
+            --wlq_amber: #ff8c00;      /* 琥珀橙（沿用原练习渐变色3） */
+            --wlq_moss: #2e8b57;       /* 苔绿（沿用原练习渐变色2） */
+            --wlq_grad: linear-gradient(135deg, var(--wlq_vermilion), var(--wlq_amber));
+            --wlq_display_font: Georgia, "Times New Roman", "STZhongsong", "KaiTi", serif;
+            --wlq_body_font: "Segoe UI", "Microsoft YaHei", sans-serif;
+        }
 
-    html,body{
-      margin:0;
-      min-height:100%;
-      font-family:"Microsoft YaHei","PingFang SC","Segoe UI",Arial,sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(139,92,246,0.10), transparent 24%),
-        radial-gradient(circle at bottom right, rgba(79,70,229,0.10), transparent 28%),
-        linear-gradient(135deg,var(--bg1),var(--bg2));
-    }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
 
-    body{
-      padding:28px 20px 60px;
-    }
+        ul {
+            list-style: none;
+        }
 
-    .container{
-      max-width:1180px;
-      margin:0 auto;
-    }
+        body {
+            background: var(--wlq_paper);
+            color: var(--wlq_ink);
+            font-family: var(--wlq_body_font);
+            /* 纸张颗粒质感 */
+            background-image: radial-gradient(rgba(27, 19, 16, .05) 1px, transparent 1px);
+            background-size: 22px 22px;
+            overflow-x: hidden;
+        }
 
-    .topbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:16px;
-      background:rgba(255,255,255,0.72);
-      backdrop-filter: blur(10px);
-      border:1px solid var(--line);
-      border-radius:24px;
-      padding:20px 24px;
-      box-shadow:var(--shadow);
-    }
+        @keyframes wlq_fade_up {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
 
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:16px;
-    }
+        @keyframes wlq_marquee {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
 
-    .brand-mark{
-      width:54px;
-      height:54px;
-      border-radius:18px;
-      background:linear-gradient(135deg,var(--primary),var(--primary-2));
-      display:grid;
-      place-items:center;
-      color:#fff;
-      font-weight:800;
-      font-size:1.35rem;
-      box-shadow:0 12px 28px rgba(79,70,229,0.25);
-    }
+        @keyframes wlq_float {
+            0%, 100% { transform: translateY(0) rotate(8deg); }
+            50%      { transform: translateY(-18px) rotate(14deg); }
+        }
 
-    .brand h1{
-      margin:0;
-      font-size:clamp(1.3rem,2vw,2.2rem);
-      line-height:1.2;
-    }
+        @keyframes wlq_spin_slow {
+            to { transform: rotate(360deg); }
+        }
 
-    .brand small{
-      display:block;
-      margin-top:4px;
-      color:var(--muted);
-      letter-spacing:.08em;
-      font-size:.78rem;
-    }
+        /* ============ 案例一：flex 导航布局 ============ */
+        .wlq_nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--wlq_ink);
+            color: var(--wlq_cream);
+            padding: 14px 4vw;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 3px solid var(--wlq_vermilion);
+        }
 
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:10px 14px;
-      border-radius:999px;
-      background:linear-gradient(135deg, rgba(79,70,229,0.08), rgba(139,92,246,0.12));
-      border:1px solid rgba(79,70,229,0.18);
-      color:var(--primary);
-      font-weight:700;
-      white-space:nowrap;
-    }
+        .wlq_logo {
+            font-family: var(--wlq_display_font);
+            font-size: 26px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
 
-    .hero{
-      margin-top:28px;
-      display:grid;
-      grid-template-columns:1.45fr .72fr;
-      gap:24px;
-    }
+        .wlq_logo em {
+            font-style: normal;
+            background: var(--wlq_grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
 
-    .hero-card,
-    .stats-card,
-    .prompt-card,
-    .module-card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:26px;
-      box-shadow:var(--shadow);
-    }
+        .wlq_nav_list {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
 
-    .hero-card{
-      position:relative;
-      overflow:hidden;
-      padding:32px;
-    }
+        .wlq_nav_list a {
+            color: var(--wlq_cream);
+            font-size: 15px;
+            padding: 9px 16px;
+            border-radius: 999px;
+            transition: background .25s, color .25s;
+        }
 
-    .hero-card::before{
-      content:"";
-      position:absolute;
-      width:220px;
-      height:220px;
-      left:-55px;
-      top:-40px;
-      border-radius:50%;
-      background:radial-gradient(circle, rgba(79,70,229,0.14), transparent 65%);
-    }
+        .wlq_nav_list a:hover {
+            background: rgba(255, 250, 239, .16);
+        }
 
-    .hero-card::after{
-      content:"";
-      position:absolute;
-      width:200px;
-      height:200px;
-      right:-30px;
-      bottom:-40px;
-      border-radius:50%;
-      background:radial-gradient(circle, rgba(6,182,212,0.12), transparent 66%);
-    }
+        .wlq_nav_list a.wlq_active {
+            background: var(--wlq_grad);
+            color: #fff;
+            font-weight: bold;
+        }
 
-    .eyebrow{
-      position:relative;
-      z-index:1;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      background:rgba(16,185,129,0.10);
-      border:1px solid rgba(16,185,129,0.18);
-      color:var(--success);
-      font-weight:700;
-      font-size:.82rem;
-      letter-spacing:.04em;
-    }
+        /* ============ 首屏 HERO（flex 双栏） ============ */
+        .wlq_hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 72px 24px 56px;
+            flex-wrap: wrap;
+        }
 
-    .eyebrow::before{
-      content:"✦";
-    }
+        .wlq_hero_text {
+            flex: 1 1 460px;
+            animation: wlq_fade_up .8s ease both;
+        }
 
-    .hero-card h2{
-      position:relative;
-      z-index:1;
-      margin:18px 0 14px;
-      font-size:clamp(2rem,3vw,3.2rem);
-      line-height:1.08;
-      letter-spacing:-.04em;
-    }
+        .wlq_hero_kicker {
+            display: inline-block;
+            font-size: 13px;
+            letter-spacing: 6px;
+            padding: 6px 14px;
+            border: 1.5px solid var(--wlq_ink);
+            border-radius: 999px;
+            margin-bottom: 22px;
+        }
 
-    .hero-card p{
-      position:relative;
-      z-index:1;
-      margin:0;
-      max-width:58ch;
-      font-size:1.04rem;
-      line-height:1.85;
-      color:var(--muted);
-    }
+        .wlq_hero_title {
+            font-family: var(--wlq_display_font);
+            font-size: clamp(44px, 7vw, 84px);
+            line-height: 1.08;
+            letter-spacing: 2px;
+        }
 
-    .hero-actions{
-      position:relative;
-      z-index:1;
-      margin-top:24px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:14px;
-    }
+        .wlq_hero_title span {
+            background: var(--wlq_grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-style: italic;
+        }
 
-    .button{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:13px 20px;
-      border-radius:14px;
-      text-decoration:none;
-      font-weight:700;
-      transition: transform .2s ease, box-shadow .2s ease;
-      border:1px solid transparent;
-    }
+        .wlq_hero_sub {
+            margin-top: 18px;
+            font-size: 17px;
+            color: #5c4a3d;
+            max-width: 46ch;
+            line-height: 1.9;
+        }
 
-    .button:hover{
-      transform:translateY(-1px);
-    }
+        .wlq_hero_btns {
+            display: flex;
+            gap: 14px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
 
-    .button.primary{
-      background:linear-gradient(135deg,var(--primary),var(--primary-2));
-      color:#fff;
-      box-shadow:0 14px 28px rgba(79,70,229,0.25);
-    }
+        .wlq_btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 26px;
+            border-radius: 999px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform .25s, box-shadow .25s;
+        }
 
-    .button.secondary{
-      background:rgba(255,255,255,0.75);
-      border-color:rgba(79,70,229,0.18);
-      color:var(--primary);
-    }
+        .wlq_btn:hover {
+            transform: translateY(-3px);
+        }
 
-    .stats-card{
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      gap:18px;
-      padding:24px;
-    }
+        .wlq_btn_primary {
+            background: var(--wlq_grad);
+            color: #fff;
+            box-shadow: 0 10px 24px rgba(255, 99, 71, .35);
+        }
 
-    .stat{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding:16px 18px;
-      border-radius:18px;
-      background:linear-gradient(135deg, rgba(255,255,255,0.8), rgba(239,246,255,0.8));
-      border:1px solid rgba(79,70,229,0.10);
-    }
+        .wlq_btn_ghost {
+            border: 2px solid var(--wlq_ink);
+            color: var(--wlq_ink);
+        }
 
-    .stat .label{
-      color:var(--muted);
-      font-weight:600;
-      font-size:.95rem;
-    }
+        .wlq_btn_ghost:hover {
+            background: var(--wlq_ink);
+            color: var(--wlq_cream);
+        }
 
-    .stat .value{
-      font-size:1.4rem;
-      font-weight:800;
-      color:var(--text);
-    }
+        /* 右侧艺术装饰块（纯 CSS 图形） */
+        .wlq_hero_art {
+            flex: 0 1 300px;
+            height: 300px;
+            position: relative;
+            animation: wlq_fade_up .8s .15s ease both;
+        }
 
-    .prompt-card{
-      margin-top:28px;
-      padding:22px 24px;
-      border-left:5px solid var(--primary-2);
-      background:linear-gradient(135deg, rgba(255,255,255,0.78), rgba(239,246,255,0.8));
-    }
+        .wlq_art_disc {
+            position: absolute;
+            inset: 12% 18%;
+            border-radius: 50%;
+            background: var(--wlq_grad);
+            box-shadow: 0 24px 60px rgba(255, 140, 0, .35);
+        }
 
-    .prompt-card h3{
-      margin:0 0 12px;
-      font-size:1.08rem;
-    }
+        .wlq_art_ring {
+            position: absolute;
+            inset: 0;
+            border: 2px dashed var(--wlq_ink);
+            border-radius: 50%;
+            animation: wlq_spin_slow 26s linear infinite;
+        }
 
-    .prompt-text{
-      margin:0;
-      line-height:1.9;
-      color:var(--text);
-      word-break:break-word;
-    }
+        .wlq_art_square {
+            position: absolute;
+            right: -6px;
+            top: -6px;
+            width: 92px;
+            height: 92px;
+            border: 2px solid var(--wlq_ink);
+            background: var(--wlq_moss);
+            animation: wlq_float 5s ease-in-out infinite;
+        }
 
-    .module-section{
-      margin-top:30px;
-    }
+        .wlq_art_dot {
+            position: absolute;
+            left: 4px;
+            bottom: 2px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--wlq_ink);
+        }
 
-    .section-head{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:18px;
-      margin-bottom:18px;
-    }
+        /* ============ 跑马灯横幅 ============ */
+        .wlq_marquee {
+            background: var(--wlq_ink);
+            color: var(--wlq_paper);
+            overflow: hidden;
+            padding: 14px 0;
+            border-top: 3px solid var(--wlq_vermilion);
+            border-bottom: 3px solid var(--wlq_vermilion);
+            font-family: var(--wlq_display_font);
+            font-size: 20px;
+            letter-spacing: 4px;
+            white-space: nowrap;
+        }
 
-    .section-head h3{
-      margin:0;
-      font-size:clamp(1.4rem,2vw,1.9rem);
-    }
+        .wlq_marquee_track {
+            display: inline-flex;
+            animation: wlq_marquee 22s linear infinite;
+        }
 
-    .section-head span{
-      color:var(--muted);
-      font-size:.95rem;
-    }
+        .wlq_marquee_track span {
+            padding: 0 28px;
+        }
 
-    .module-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-      gap:22px;
-    }
+        .wlq_marquee_track i {
+            color: var(--wlq_amber);
+            font-style: normal;
+            padding: 0 4px;
+        }
 
-    .module-card{
-      position:relative;
-      overflow:hidden;
-      padding:22px 20px 18px;
-      transition:transform .22s ease, box-shadow .22s ease;
-    }
+        /* ============ 案例二：三等分特性栏 ============ */
+        .wlq_features {
+            display: flex;
+            gap: 20px;
+            max-width: 1100px;
+            margin: 64px auto 0;
+            padding: 0 24px;
+            flex-wrap: wrap;
+        }
 
-    .module-card:hover{
-      transform:translateY(-4px);
-      box-shadow:0 20px 34px rgba(79,70,229,0.16);
-    }
+        .wlq_feature {
+            flex: 1 1 240px;
+            background: var(--wlq_cream);
+            border: 2px solid var(--wlq_ink);
+            border-radius: 16px;
+            padding: 28px 24px;
+            box-shadow: 6px 6px 0 var(--wlq_ink);
+            transition: transform .25s, box-shadow .25s;
+            animation: wlq_fade_up .7s ease both;
+        }
 
-    .module-card::before{
-      content:"";
-      position:absolute;
-      left:0;
-      top:0;
-      width:100%;
-      height:4px;
-      background:linear-gradient(90deg,var(--primary),var(--primary-2));
-    }
+        .wlq_feature:nth-child(2) { animation-delay: .1s; }
+        .wlq_feature:nth-child(3) { animation-delay: .2s; }
 
-    .module-icon{
-      width:56px;
-      height:56px;
-      display:grid;
-      place-items:center;
-      border-radius:16px;
-      font-size:1.5rem;
-      background:linear-gradient(135deg, rgba(79,70,229,0.10), rgba(139,92,246,0.12));
-      border:1px solid rgba(79,70,229,0.12);
-      color:var(--primary);
-      margin-bottom:14px;
-    }
+        .wlq_feature:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 10px 10px 0 var(--wlq_vermilion);
+        }
 
-    .module-card h4{
-      margin:0 0 10px;
-      font-size:1.2rem;
-    }
+        .wlq_feature_no {
+            font-family: var(--wlq_display_font);
+            font-size: 44px;
+            font-weight: bold;
+            background: var(--wlq_grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
 
-    .module-card p{
-      margin:0;
-      color:var(--muted);
-      line-height:1.75;
-      font-size:.95rem;
-    }
+        .wlq_feature h3 {
+            font-size: 21px;
+            margin: 10px 0 8px;
+        }
 
-    .module-link{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      margin-top:18px;
-      padding:10px 14px;
-      border-radius:12px;
-      background:rgba(79,70,229,0.08);
-      border:1px solid rgba(79,70,229,0.18);
-      color:var(--primary);
-      text-decoration:none;
-      font-weight:700;
-      transition: background .2s ease;
-    }
+        .wlq_feature p {
+            font-size: 14.5px;
+            line-height: 1.85;
+            color: #5c4a3d;
+        }
 
-    .module-link:hover{
-      background:rgba(79,70,229,0.12);
-    }
+        /* ============ 案例三：flex 响应式作品卡片网格 ============ */
+        .wlq_gallery {
+            max-width: 1100px;
+            margin: 70px auto 0;
+            padding: 0 24px;
+        }
 
-    .module-link.disabled{
-      pointer-events:none;
-      cursor:default;
-      background:rgba(148,163,184,0.08);
-      border-color:rgba(148,163,184,0.20);
-      color:var(--muted);
-    }
+        .wlq_section_title {
+            font-family: var(--wlq_display_font);
+            font-size: 34px;
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+            margin-bottom: 26px;
+        }
 
-    .footer{
-      margin-top:34px;
-      text-align:center;
-      color:var(--muted);
-      font-size:.92rem;
-      padding:16px 0 0;
-    }
+        .wlq_section_title small {
+            font-size: 14px;
+            letter-spacing: 3px;
+            color: #8a7360;
+        }
 
-    @media (max-width:860px){
-      .topbar{
-        flex-direction:column;
-        align-items:flex-start;
-      }
+        .wlq_card_grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
 
-      .hero{
-        grid-template-columns:1fr;
-      }
+        .wlq_card {
+            flex: 1 1 300px;
+            background: var(--wlq_cream);
+            border: 2px solid var(--wlq_ink);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform .28s, box-shadow .28s;
+        }
 
-      .section-head{
-        flex-direction:column;
-        align-items:flex-start;
-      }
-    }
-  </style>
+        .wlq_card:hover {
+            transform: translateY(-6px) rotate(-.4deg);
+            box-shadow: 0 16px 34px rgba(27, 19, 16, .18);
+        }
+
+        .wlq_card_cover {
+            height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--wlq_display_font);
+            font-size: 46px;
+            color: #fff;
+            border-bottom: 2px solid var(--wlq_ink);
+        }
+
+        .wlq_cover_a { background: var(--wlq_grad); }
+        .wlq_cover_b { background: var(--wlq_ink); }
+        .wlq_cover_c { background: var(--wlq_moss); }
+        .wlq_cover_d { background: linear-gradient(135deg, var(--wlq_amber), var(--wlq_moss)); }
+
+        .wlq_card_body {
+            padding: 18px 20px 20px;
+        }
+
+        .wlq_card_tag {
+            display: inline-block;
+            font-size: 12px;
+            letter-spacing: 2px;
+            padding: 4px 12px;
+            border: 1.5px solid var(--wlq_vermilion);
+            color: var(--wlq_vermilion);
+            border-radius: 999px;
+            margin-bottom: 10px;
+        }
+
+        .wlq_card_body h3 {
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+
+        .wlq_card_body p {
+            font-size: 14px;
+            color: #6b584a;
+            line-height: 1.8;
+        }
+
+        /* ============ 页脚 ============ */
+        .wlq_footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            max-width: 1100px;
+            margin: 80px auto 0;
+            padding: 26px 24px 40px;
+            border-top: 2px dashed rgba(27, 19, 16, .35);
+            font-size: 14px;
+            color: #6b584a;
+        }
+
+        .wlq_footer strong {
+            font-family: var(--wlq_display_font);
+            font-size: 18px;
+            color: var(--wlq_ink);
+        }
+
+        @media (max-width: 640px) {
+            .wlq_nav { flex-direction: column; gap: 10px; }
+            .wlq_hero { padding-top: 44px; }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-mark">W</div>
-        <div>
-          <h1>王柳晴的《高级网页设计》课堂实践</h1>
-          <small>Web Design Practice Course</small>
+    <!-- 学号：24002120127 姓名：王柳晴 -->
+
+    <!-- 案例一：flex 导航布局 -->
+    <nav class="wlq_nav">
+        <a href="index.html" class="wlq_logo">WLQ<em>·ATELIER</em></a>
+        <ul class="wlq_nav_list">
+            <li><a class="wlq_active" href="index.html">首页</a></li>
+            <li><a href="iconfont-1.html">字体图标</a></li>
+            <li><a href="iconfont-2.html">矢量图标</a></li>
+            <li><a href="svg005.html">SVG符号</a></li>
+            <li><a href="flex布局复习.html">Flex复习</a></li>
+        </ul>
+    </nav>
+
+    <!-- 首屏：flex 双栏 -->
+    <header class="wlq_hero">
+        <div class="wlq_hero_text">
+            <span class="wlq_hero_kicker">高级网页设计 · 课程实验场</span>
+            <h1 class="wlq_hero_title">图标、<br>排版与<span>布局</span>的<br>艺术实验。</h1>
+            <p class="wlq_hero_sub">这里陈列字体图标与矢量图标的两种哲学：一个把图形铸进字库，一个用线条勾勒世界。所有版面皆以 Flex 布局编织而成。</p>
+            <div class="wlq_hero_btns">
+                <a class="wlq_btn wlq_btn_primary" href="iconfont-1.html">字体图标馆</a>
+                <a class="wlq_btn wlq_btn_ghost" href="iconfont-2.html">矢量图标馆</a>
+            </div>
         </div>
-      </div>
-      <div class="badge">课堂目录</div>
+        <div class="wlq_hero_art">
+            <div class="wlq_art_disc"></div>
+            <div class="wlq_art_ring"></div>
+            <div class="wlq_art_square"></div>
+            <div class="wlq_art_dot"></div>
+        </div>
     </header>
 
-    <section class="hero">
-      <div class="hero-card">
-        <div class="eyebrow">教学主页</div>
-        <h2>高级网页设计课堂实践目录</h2>
-        <p>
-          本页面汇总了本目录下的重点网页内容，便于快速浏览课程学习成果。
-          包含 flex 复习、字体图标等模块，并持续扩充其余模块内容。
-        </p>
-
-        <div class="hero-actions">
-          <a class="button primary" href="./flex布局复习.html">打开 flex复习</a>
-          <a class="button secondary" href="./svg005.html">打开 字体图标</a>
+    <!-- 跑马灯 -->
+    <div class="wlq_marquee">
+        <div class="wlq_marquee_track">
+            <span>FONT ICONS <i>◆</i> SVG VECTORS <i>◆</i> FLEX LAYOUT <i>◆</i> ART BRANDING <i>◆</i> FONT ICONS <i>◆</i> SVG VECTORS <i>◆</i> FLEX LAYOUT <i>◆</i> ART BRANDING <i>◆</i></span>
+            <span>FONT ICONS <i>◆</i> SVG VECTORS <i>◆</i> FLEX LAYOUT <i>◆</i> ART BRANDING <i>◆</i> FONT ICONS <i>◆</i> SVG VECTORS <i>◆</i> FLEX LAYOUT <i>◆</i> ART BRANDING <i>◆</i></span>
         </div>
-      </div>
-
-      <aside class="stats-card">
-        <div class="stat">
-          <span class="label">已完成模块</span>
-          <span class="value">2</span>
-        </div>
-        <div class="stat">
-          <span class="label">待更新模块</span>
-          <span class="value">更多</span>
-        </div>
-        <div class="stat">
-          <span class="label">页面类型</span>
-          <span class="value">原生 HTML</span>
-        </div>
-      </aside>
-    </section>
-
-    <section class="prompt-card">
-      <h3>本提示词</h3>
-      <p class="prompt-text">
-        <prompt>
-创建一个新页面，包括本目录下的所有网页的超链接，使用原生代码，不使用cdn，新页面名称为index.html，主题为王柳晴的《高级网页设计》课堂实践，美化页面，课堂目录中包含flex复习、字体图标、其余模块等并且点击能够进入相关页面。页面中包括本提示词。
-        </prompt>
-      </p>
-    </section>
-
-    <section class="module-section">
-      <div class="section-head">
-        <h3>课堂目录</h3>
-        <span>可点击进入相关网页</span>
-      </div>
-
-      <div class="module-grid" id="moduleGrid"></div>
-    </section>
-
-    <div class="footer">
-      说明：后续新增网页时，可继续扩充目录列表。
     </div>
-  </div>
 
-  <script>
-    const pageMeta = [
-      {
-        icon: "🧩",
-        name: "flex复习",
-        desc: "复习 Flexbox 布局技巧，掌握响应式排版与弹性布局应用。",
-        file: "./flex复习.html"
-      },
-      {
-        icon: "🔤",
-        name: "字体图标",
-        desc: "学习字体图标的使用方式，提升页面美观度与视觉表达力。",
-        file: "./字体图标.html"
-      },
-      {
-        icon: "📌",
-        name: "其余模块后续在增加",
-        desc: "后续课程模块会继续补充到当前目录中，页面会同步更新。",
-        file: "",
-        disabled: true
-      }
-    ];
+    <!-- 案例二：三等分特性栏 -->
+    <section class="wlq_features">
+        <div class="wlq_feature">
+            <div class="wlq_feature_no">01</div>
+            <h3>图标即字体</h3>
+            <p>Font Awesome 把图标铸成字形，@font-face 加载字库，一个 class 名即可点亮一枚图形，缩放如文字般顺滑。</p>
+        </div>
+        <div class="wlq_feature">
+            <div class="wlq_feature_no">02</div>
+            <h3>图标即矢量</h3>
+            <p>Lucide 以 SVG 描边作画，线条粗细、颜色、尺寸皆可随 CSS 自由调度，是像素级掌控者的画笔。</p>
+        </div>
+        <div class="wlq_feature">
+            <div class="wlq_feature_no">03</div>
+            <h3>布局即骨架</h3>
+            <p>导航、三等分、卡片网格、侧边栏——所有展陈空间都由 Flex 容器与主轴交叉轴编排而成。</p>
+        </div>
+    </section>
 
-    const grid = document.getElementById("moduleGrid");
+    <!-- 案例三：flex 响应式卡片网格 -->
+    <section class="wlq_gallery">
+        <h2 class="wlq_section_title">作品陈列 <small>SELECTED WORKS</small></h2>
+        <div class="wlq_card_grid">
+            <a class="wlq_card" href="iconfont-1.html">
+                <div class="wlq_card_cover wlq_cover_a">Fa</div>
+                <div class="wlq_card_body">
+                    <span class="wlq_card_tag">FONT ICON</span>
+                    <h3>字体图标馆</h3>
+                    <p>Font Awesome 6 · 实心 / 常规 / 品牌三大字体族，动效图标一网打尽。</p>
+                </div>
+            </a>
+            <a class="wlq_card" href="iconfont-2.html">
+                <div class="wlq_card_cover wlq_cover_b">Lu</div>
+                <div class="wlq_card_body">
+                    <span class="wlq_card_tag">SVG VECTOR</span>
+                    <h3>矢量图标馆</h3>
+                    <p>Lucide 描边图标，SVG 方式渲染，线宽与颜色随 CSS 实时变化。</p>
+                </div>
+            </a>
+            <a class="wlq_card" href="svg005.html">
+                <div class="wlq_card_cover wlq_cover_c">Svg</div>
+                <div class="wlq_card_body">
+                    <span class="wlq_card_tag">SYMBOL</span>
+                    <h3>SVG 符号练习</h3>
+                    <p>阿里 iconfont 的 symbol 引用方式，点击切换高亮的标签栏案例。</p>
+                </div>
+            </a>
+            <a class="wlq_card" href="flex布局复习.html">
+                <div class="wlq_card_cover wlq_cover_d">Fx</div>
+                <div class="wlq_card_body">
+                    <span class="wlq_card_tag">LAYOUT</span>
+                    <h3>Flex 布局复习</h3>
+                    <p>导航、三等分、卡片网格、侧边栏——本站骨架的灵感原点。</p>
+                </div>
+            </a>
+        </div>
+    </section>
 
-    pageMeta.forEach((item) => {
-      const card = document.createElement("article");
-      card.className = "module-card";
+    <!-- 页脚 -->
+    <footer class="wlq_footer">
+        <strong>WLQ·ATELIER</strong>
+        <span>学号 24002120127 · 王柳晴</span>
+        <span id="wlq_year"></span>
+    </footer>
 
-      const href = item.disabled || !item.file ? "javascript:void(0);" : item.file;
-      const buttonText = item.disabled ? "待更新" : "进入页面";
-
-      card.innerHTML = `
-        <div class="module-icon">${item.icon}</div>
-        <h4>${item.name}</h4>
-        <p>${item.desc}</p>
-        <a class="module-link ${item.disabled ? "disabled" : ""}" href="${href}" ${item.disabled ? 'onclick="return false;"' : ""}>
-          ${buttonText}
-        </a>
-      `;
-
-      grid.appendChild(card);
-    });
-  </script>
+    <script>
+        // 所有 JS 变量以 wlq_ 开头
+        var wlq_now = new Date();
+        var wlq_year_el = document.getElementById("wlq_year");
+        wlq_year_el.textContent = "© " + wlq_now.getFullYear() + " 高级网页设计课程作业";
+    </script>
 </body>
+
 </html>
