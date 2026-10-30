@@ -60,3 +60,23 @@ gitee私人令牌 （已脱敏，现存放于 Windows 凭据管理器）
 **执行说明：** 按 commit-project skill 执行：审查变更→暂存（脱敏 wlq_prompt.md 中令牌后）→commit→push 到 gitee.com/wang-liu-qing/my-wangliuqing（凭据管理器自动认证）。
 
 ---
+
+## 2026-10-30 14:42 | 模型：GLM-5.3-Flash
+
+**提示词内容：**
+
+创建技能skill：提交到github，将本项目提交commit并push到`https://github.com/666ssq888/wangliuqing`，使用已设置公钥
+
+**执行说明：** 已创建全局技能 `C:\Users\王柳晴\.trae-cn\skills\commit-github\SKILL.md`。实测要点：22 端口不通，SSH 公钥认证走 ssh.github.com:443 成功（Hi 666ssq888!）；Git 自带 ssh 不读 ~/.ssh/config，故 push 时用 GIT_SSH_COMMAND 显式指定私钥与 known_hosts。
+
+---
+
+## 2026-10-30 14:42 | 模型：GLM-5.3-Flash
+
+**提示词内容：**
+
+提交到 github
+
+**执行说明：** 按 commit-github skill 执行：审查变更→commit→push 到 github.com/666ssq888/wangliuqing（SSH 公钥认证）。工作区原本干净，本次提交内容即本条提示词记录。
+
+---
