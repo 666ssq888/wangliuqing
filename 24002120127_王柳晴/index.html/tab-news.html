@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新闻选项卡 | 24002120127 王柳晴</title>
+    <!--
+      作者：王柳晴
+      建立时间：2026-11-04 13:42
+      使用大模型：GLM-5.3-Flash
+      功能名称：新闻选项卡（国内/省内/国际/最热，tab 切换）
+    -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --wlq_ink: #1b1310;
+            --wlq_paper: #f8f1e4;
+            --wlq_cream: #fffaef;
+            --wlq_vermilion: #ff6347;
+            --wlq_amber: #ff8c00;
+            --wlq_grad: linear-gradient(135deg, var(--wlq_vermilion), var(--wlq_amber));
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        body {
+            background: var(--wlq_paper);
+            color: var(--wlq_ink);
+            font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+            background-image: radial-gradient(rgba(27, 19, 16, .05) 1px, transparent 1px);
+            background-size: 22px 22px;
+            padding: 40px 4vw;
+        }
+
+        /* ============ 顶部：返回首页入口 ============ */
+        .wlq_topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 34px;
+        }
+
+        .wlq_title {
+            font-family: Georgia, "Times New Roman", "STZhongsong", "KaiTi", serif;
+            font-size: 30px;
+        }
+
+        .wlq_back_home {
+            padding: 9px 18px;
+            border-radius: 999px;
+            background: var(--wlq_ink);
+            color: var(--wlq_cream);
+            font-size: 14px;
+            transition: opacity .25s;
+        }
+
+        .wlq_back_home:hover {
+            opacity: .82;
+        }
+
+        /* ============ tab 选项卡 ============ */
+        .wlq_tabs {
+            max-width: 860px;
+            margin: 0 auto;
+            background: var(--wlq_cream);
+            border-radius: 16px;
+            box-shadow: 0 12px 32px rgba(27, 19, 16, .12);
+            overflow: hidden;
+        }
+
+        .wlq_tab_bar {
+            display: flex;
+            background: var(--wlq_ink);
+        }
+
+        .wlq_tab_item {
+            flex: 1;
+            text-align: center;
+            padding: 15px 10px;
+            color: var(--wlq_cream);
+            font-size: 16px;
+            cursor: pointer;
+            user-select: none;
+            transition: background .25s, color .25s;
+        }
+
+        .wlq_tab_item:hover {
+            background: rgba(255, 250, 239, .16);
+        }
+
+        /* 选中状态：JS 切换的就是这个类 */
+        .wlq_tab_item.wlq_active {
+            background: var(--wlq_grad);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* ============ 新闻内容面板 ============ */
+        .wlq_tab_panel {
+            display: none; /* 未选中的面板隐藏，JS 切换 wlq_active 显示 */
+            padding: 26px 30px 32px;
+        }
+
+        .wlq_tab_panel.wlq_active {
+            display: block;
+        }
+
+        .wlq_tab_panel h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            padding-left: 12px;
+            border-left: 5px solid var(--wlq_vermilion);
+        }
+
+        .wlq_news_list li {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 13px 4px;
+            border-bottom: 1px dashed rgba(27, 19, 16, .25);
+            font-size: 15px;
+        }
+
+        .wlq_news_list li:hover .wlq_news_text {
+            color: var(--wlq_vermilion);
+        }
+
+        .wlq_news_time {
+            flex-shrink: 0;
+            color: rgba(27, 19, 16, .55);
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <header class="wlq_topbar">
+        <h1 class="wlq_title">新闻中心 · Tab 选项卡</h1>
+        <!-- 规则要求：新建 html 文件加入超链接入口到首页 index.html -->
+        <a class="wlq_back_home" href="index.html">← 返回首页</a>
+    </header>
+
+    <main>
+        <section class="wlq_tabs">
+            <!-- 选项卡标题栏：data-wlq-panel 指向对应内容面板的 id -->
+            <ul class="wlq_tab_bar" id="wlq_newsBar">
+                <li class="wlq_tab_item wlq_active" data-wlq-panel="wlq_panel_domestic">国内新闻</li>
+                <li class="wlq_tab_item" data-wlq-panel="wlq_panel_province">省内新闻</li>
+                <li class="wlq_tab_item" data-wlq-panel="wlq_panel_world">国际新闻</li>
+                <li class="wlq_tab_item" data-wlq-panel="wlq_panel_hot">最热新闻</li>
+            </ul>
+
+            <!-- 内容面板：国内新闻为默认选中 -->
+            <div class="wlq_tab_panel wlq_active" id="wlq_panel_domestic">
+                <h2>国内新闻</h2>
+                <ul class="wlq_news_list">
+                    <li><span class="wlq_news_text">全国秋季粮食收获过八成，丰收格局基本定型</span><span class="wlq_news_time">11-04 09:20</span></li>
+                    <li><span class="wlq_news_text">新一轮促消费政策出台，多地发放数字消费券</span><span class="wlq_news_time">11-04 08:45</span></li>
+                    <li><span class="wlq_news_text">国产大飞机 C929 完成新阶段试飞科目</span><span class="wlq_news_time">11-03 21:10</span></li>
+                    <li><span class="wlq_news_text">全国铁路今起实行新列车运行图，运力进一步提升</span><span class="wlq_news_time">11-03 18:32</span></li>
+                </ul>
+            </div>
+
+            <div class="wlq_tab_panel" id="wlq_panel_province">
+                <h2>省内新闻</h2>
+                <ul class="wlq_news_list">
+                    <li><span class="wlq_news_text">我省新增三条高速公路通车，县域联通率创新高</span><span class="wlq_news_time">11-04 10:05</span></li>
+                    <li><span class="wlq_news_text">省博物馆数字展厅全新开放，可线上云游馆藏</span><span class="wlq_news_time">11-04 07:58</span></li>
+                    <li><span class="wlq_news_text">高校科技成果转化对接会签约金额破百亿</span><span class="wlq_news_time">11-03 16:44</span></li>
+                    <li><span class="wlq_news_text">全省职业技能大赛开赛，来自 16 地市选手同台竞技</span><span class="wlq_news_time">11-02 14:21</span></li>
+                </ul>
+            </div>
+
+            <div class="wlq_tab_panel" id="wlq_panel_world">
+                <h2>国际新闻</h2>
+                <ul class="wlq_news_list">
+                    <li><span class="wlq_news_text">多国代表呼吁加强人工智能全球治理合作</span><span class="wlq_news_time">11-04 11:36</span></li>
+                    <li><span class="wlq_news_text">国际航天大会开幕，深空探测成焦点议题</span><span class="wlq_news_time">11-04 06:15</span></li>
+                    <li><span class="wlq_news_text">全球海运价格回落，供应链压力持续缓解</span><span class="wlq_news_time">11-03 19:50</span></li>
+                    <li><span class="wlq_news_text">联合国粮农组织发布最新世界粮食安全报告</span><span class="wlq_news_time">11-02 22:03</span></li>
+                </ul>
+            </div>
+
+            <div class="wlq_tab_panel" id="wlq_panel_hot">
+                <h2>最热新闻</h2>
+                <ul class="wlq_news_list">
+                    <li><span class="wlq_news_text">热搜第一：全运会开幕式彩排水下点火惊艳全场</span><span class="wlq_news_time">11-04 12:00</span></li>
+                    <li><span class="wlq_news_text">围观量破亿：智能机器人马拉松开跑</span><span class="wlq_news_time">11-04 09:47</span></li>
+                    <li><span class="wlq_news_text">热门话题：冬季旅游预订量同比增长 120%</span><span class="wlq_news_time">11-03 20:26</span></li>
+                    <li><span class="wlq_news_text">网友热议：今冬首场寒潮即将来袭，多地气温骤降</span><span class="wlq_news_time">11-03 15:12</span></li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <!-- 外部引用 js 文件夹中的 tab.js -->
+    <script src="js/tab.js"></script>
+    <script>
+        // 初始化新闻选项卡：容器 id 为 wlq_newsBar，选中状态类名为 wlq_active
+        wlq_initTabs('wlq_newsBar', 'wlq_active');
+    </script>
+</body>
+</html>
