@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>矢量图标馆 | Lucide SVG | WLQ·ATELIER</title>
+    <!-- 本地 CDN：Lucide（SVG 方式渲染） -->
+    <script src="./cdn/lucide/lucide.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --wlq_ink: #1b1310;
+            --wlq_paper: #f8f1e4;
+            --wlq_cream: #fffaef;
+            --wlq_vermilion: #ff6347;
+            --wlq_amber: #ff8c00;
+            --wlq_moss: #2e8b57;
+            --wlq_grad: linear-gradient(135deg, var(--wlq_vermilion), var(--wlq_amber));
+            --wlq_display_font: Georgia, "Times New Roman", "STZhongsong", "KaiTi", serif;
+            --wlq_body_font: "Segoe UI", "Microsoft YaHei", sans-serif;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        body {
+            background: var(--wlq_paper);
+            color: var(--wlq_ink);
+            font-family: var(--wlq_body_font);
+            background-image: radial-gradient(rgba(27, 19, 16, .05) 1px, transparent 1px);
+            background-size: 22px 22px;
+            overflow-x: hidden;
+        }
+
+        @keyframes wlq_fade_up {
+            from { opacity: 0; transform: translateY(26px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============ 顶部导航（flex） ============ */
+        .wlq_nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--wlq_ink);
+            color: var(--wlq_cream);
+            padding: 14px 4vw;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 3px solid var(--wlq_moss);
+        }
+
+        .wlq_logo {
+            font-family: var(--wlq_display_font);
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .wlq_logo em {
+            font-style: normal;
+            background: var(--wlq_grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .wlq_nav_list { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+        .wlq_nav_list a {
+            color: var(--wlq_cream);
+            font-size: 15px;
+            padding: 9px 16px;
+            border-radius: 999px;
+            transition: background .25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wlq_nav_list a:hover { background: rgba(255, 250, 239, .16); }
+
+        .wlq_nav_list a.wlq_home_entry {
+            background: var(--wlq_grad);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .wlq_nav_list svg { width: 17px; height: 17px; }
+
+        /* ============ 页头 ============ */
+        .wlq_hero {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 64px 24px 40px;
+            animation: wlq_fade_up .8s ease both;
+        }
+
+        .wlq_hero_kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            letter-spacing: 5px;
+            padding: 6px 14px;
+            border: 1.5px solid var(--wlq_ink);
+            border-radius: 999px;
+            margin-bottom: 20px;
+        }
+
+        .wlq_hero_kicker svg { width: 15px; height: 15px; }
+
+        .wlq_hero h1 {
+            font-family: var(--wlq_display_font);
+            font-size: clamp(38px, 6vw, 66px);
+            letter-spacing: 2px;
+            line-height: 1.12;
+        }
+
+        .wlq_hero h1 span {
+            background: var(--wlq_grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-style: italic;
+        }
+
+        .wlq_hero p {
+            margin-top: 16px;
+            max-width: 62ch;
+            font-size: 16px;
+            line-height: 1.95;
+            color: #5c4a3d;
+        }
+
+        .wlq_hero p code {
+            background: var(--wlq_ink);
+            color: var(--wlq_amber);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        /* ============ 原理代码卡 + 操控台（flex 双栏） ============ */
+        .wlq_lab {
+            display: flex;
+            gap: 22px;
+            flex-wrap: wrap;
+            max-width: 1100px;
+            margin: 26px auto 0;
+            padding: 0 24px;
+            align-items: stretch;
+        }
+
+        .wlq_code_card {
+            flex: 1 1 340px;
+            background: var(--wlq_ink);
+            color: #e8dcc8;
+            border-radius: 16px;
+            padding: 22px 24px;
+            box-shadow: 6px 6px 0 rgba(46, 139, 87, .75);
+            animation: wlq_fade_up .8s .1s ease both;
+        }
+
+        .wlq_code_card h4 {
+            color: var(--wlq_amber);
+            font-size: 14px;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+        }
+
+        .wlq_code_card pre {
+            font-family: Consolas, Monaco, monospace;
+            font-size: 13.5px;
+            line-height: 1.9;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .wlq_code_card .wlq_tag { color: #7ec699; }
+        .wlq_code_card .wlq_cls { color: #ffb366; }
+
+        /* 操控台 */
+        .wlq_console {
+            flex: 1 1 380px;
+            background: var(--wlq_cream);
+            border: 2px solid var(--wlq_ink);
+            border-radius: 16px;
+            padding: 22px 24px;
+            box-shadow: 6px 6px 0 var(--wlq_ink);
+            animation: wlq_fade_up .8s .2s ease both;
+        }
+
+        .wlq_console h4 {
+            font-size: 14px;
+            letter-spacing: 3px;
+            color: #8a7360;
+            margin-bottom: 14px;
+        }
+
+        .wlq_play_stage {
+            height: 190px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed rgba(27, 19, 16, .4);
+            border-radius: 14px;
+            background:
+                linear-gradient(45deg, transparent 48%, rgba(27, 19, 16, .07) 48%, rgba(27, 19, 16, .07) 52%, transparent 52%),
+                linear-gradient(-45deg, transparent 48%, rgba(27, 19, 16, .07) 48%, rgba(27, 19, 16, .07) 52%, transparent 52%);
+            margin-bottom: 16px;
+        }
+
+        /* Lucide 渲染出的 svg 由 CSS 变量实时控制 */
+        .wlq_play_stage svg {
+            width: var(--wlq_size, 72px);
+            height: var(--wlq_size, 72px);
+            stroke-width: var(--wlq_sw, 2);
+            color: var(--wlq_color, var(--wlq_vermilion));
+            transition: width .18s, height .18s, color .18s;
+        }
+
+        .wlq_ctrl_row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 13.5px;
+            color: #5c4a3d;
+        }
+
+        .wlq_ctrl_row label {
+            flex: 0 0 76px;
+            letter-spacing: 1px;
+        }
+
+        .wlq_ctrl_row input[type="range"] {
+            flex: 1;
+            accent-color: var(--wlq_vermilion);
+        }
+
+        .wlq_ctrl_row output {
+            flex: 0 0 46px;
+            text-align: right;
+            font-family: Consolas, monospace;
+            font-weight: bold;
+        }
+
+        .wlq_swatches { display: flex; gap: 10px; }
+
+        .wlq_swatch {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: transform .2s, border-color .2s;
+        }
+
+        .wlq_swatch:hover { transform: scale(1.15); }
+
+        .wlq_swatch.wlq_picked { border-color: var(--wlq_ink); transform: scale(1.15); }
+
+        .wlq_play_name {
+            margin-top: 14px;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            color: #6b584a;
+        }
+
+        .wlq_play_name b { color: var(--wlq_vermilion); }
+
+        /* ============ 图标墙 ============ */
+        .wlq_zone {
+            max-width: 1100px;
+            margin: 58px auto 0;
+            padding: 0 24px;
+        }
+
+        .wlq_zone_title {
+            font-family: var(--wlq_display_font);
+            font-size: 30px;
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+            margin-bottom: 8px;
+        }
+
+        .wlq_zone_title svg { width: 28px; height: 28px; color: var(--wlq_moss); }
+
+        .wlq_zone_title small {
+            font-size: 13px;
+            letter-spacing: 3px;
+            color: #8a7360;
+        }
+
+        .wlq_zone_tip {
+            font-size: 14px;
+            color: #6b584a;
+            margin-bottom: 20px;
+        }
+
+        .wlq_icon_grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .wlq_icon_cell {
+            flex: 0 0 calc((100% - 14px * 5) / 6);
+            min-width: 130px;
+            background: var(--wlq_cream);
+            border: 2px solid var(--wlq_ink);
+            border-radius: 14px;
+            padding: 20px 10px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform .22s, box-shadow .22s, background .22s;
+        }
+
+        .wlq_icon_cell:hover {
+            transform: translateY(-5px) rotate(1.2deg);
+            box-shadow: 0 12px 26px rgba(27, 19, 16, .16);
+            background: #fff;
+        }
+
+        .wlq_icon_cell.wlq_picked {
+            border-color: var(--wlq_moss);
+            box-shadow: 4px 4px 0 var(--wlq_moss);
+        }
+
+        .wlq_icon_cell svg {
+            width: 34px;
+            height: 34px;
+            color: var(--wlq_moss);
+            transition: color .2s, transform .2s;
+        }
+
+        .wlq_icon_cell:hover svg {
+            color: var(--wlq_vermilion);
+            transform: scale(1.12);
+        }
+
+        .wlq_icon_cell b {
+            display: block;
+            margin-top: 10px;
+            font-size: 12px;
+            font-weight: normal;
+            color: #6b584a;
+            word-break: break-all;
+        }
+
+        /* ============ 字体 vs SVG 对比 ============ */
+        .wlq_versus {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .wlq_versus_card {
+            flex: 1 1 300px;
+            background: var(--wlq_cream);
+            border: 2px solid var(--wlq_ink);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 6px 6px 0 rgba(27, 19, 16, .9);
+        }
+
+        .wlq_versus_card.wlq_v_svg { box-shadow: 6px 6px 0 var(--wlq_moss); }
+
+        .wlq_versus_card h3 {
+            font-family: var(--wlq_display_font);
+            font-size: 22px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .wlq_versus_card h3 svg { width: 24px; height: 24px; color: var(--wlq_vermilion); }
+        .wlq_versus_card.wlq_v_svg h3 svg { color: var(--wlq_moss); }
+
+        .wlq_versus_card li {
+            font-size: 14.5px;
+            line-height: 2;
+            color: #5c4a3d;
+            padding-left: 22px;
+            position: relative;
+        }
+
+        .wlq_versus_card li::before {
+            content: "";
+            position: absolute;
+            left: 2px;
+            top: 12px;
+            width: 8px;
+            height: 8px;
+            background: var(--wlq_vermilion);
+        }
+
+        .wlq_versus_card.wlq_v_svg li::before { background: var(--wlq_moss); border-radius: 50%; }
+
+        /* ============ 页脚 ============ */
+        .wlq_footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            max-width: 1100px;
+            margin: 76px auto 0;
+            padding: 26px 24px 40px;
+            border-top: 2px dashed rgba(27, 19, 16, .35);
+            font-size: 14px;
+            color: #6b584a;
+        }
+
+        .wlq_footer strong {
+            font-family: var(--wlq_display_font);
+            font-size: 18px;
+            color: var(--wlq_ink);
+        }
+
+        .wlq_toast {
+            position: fixed;
+            left: 50%;
+            bottom: 34px;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--wlq_ink);
+            color: var(--wlq_paper);
+            padding: 12px 26px;
+            border-radius: 999px;
+            font-size: 14px;
+            box-shadow: 0 12px 30px rgba(27, 19, 16, .35);
+            opacity: 0;
+            transition: transform .3s, opacity .3s;
+            z-index: 99;
+            pointer-events: none;
+        }
+
+        .wlq_toast.wlq_show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 900px) {
+            .wlq_icon_cell { flex-basis: calc((100% - 14px * 3) / 4); }
+        }
+
+        @media (max-width: 560px) {
+            .wlq_icon_cell { flex-basis: calc((100% - 14px) / 2); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 学号：24002120127 姓名：王柳晴 -->
+
+    <nav class="wlq_nav">
+        <a href="index.html" class="wlq_logo">WLQ<em>·ATELIER</em></a>
+        <ul class="wlq_nav_list">
+            <!-- 超链接入口：返回首页 index.html -->
+            <li><a class="wlq_home_entry" href="index.html"><i data-lucide="home"></i>返回首页</a></li>
+            <li><a href="iconfont-1.html"><i data-lucide="arrow-left"></i>字体图标馆</a></li>
+        </ul>
+    </nav>
+
+    <header class="wlq_hero">
+        <span class="wlq_hero_kicker"><i data-lucide="shapes"></i> GALLERY 02 · SVG VECTORS</span>
+        <h1>矢量图标馆：<br><span>图标即线条</span>。</h1>
+        <p>
+            Lucide 走的是另一条路：每个图标是一段 <code>&lt;svg&gt;</code> 矢量路径，用 <code>stroke</code> 描边作画。
+            页面加载后执行 <code>lucide.createIcons()</code>，<code>&lt;i data-lucide="xxx"&gt;</code> 占位符就被替换为真正的内联 SVG——
+            于是线宽、颜色、尺寸全部交由 CSS 摆布。拖动下方滑杆，亲手指挥一支画笔。
+        </p>
+    </header>
+
+    <section class="wlq_lab">
+        <div class="wlq_code_card">
+            <h4>USAGE · 用法</h4>
+            <pre>&lt;<span class="wlq_tag">script</span> src=<span class="wlq_cls">"./cdn/lucide/lucide.min.js"</span>&gt;
+&lt;/<span class="wlq_tag">script</span>&gt;
+
+&lt;<span class="wlq_tag">i</span> data-lucide=<span class="wlq_cls">"palette"</span>&gt;&lt;/<span class="wlq_tag">i</span>&gt;
+
+&lt;<span class="wlq_tag">script</span>&gt;
+  // v1.x 需显式传入图标库
+  lucide.createIcons({ icons: lucide.icons });
+&lt;/<span class="wlq_tag">script</span>&gt;
+
+/* 渲染结果（可被 CSS 完全控制） */
+&lt;svg stroke=<span class="wlq_cls">"currentColor"</span>
+     stroke-width=<span class="wlq_cls">"2"</span> fill=<span class="wlq_cls">"none"</span>&gt;
+  &lt;path d=<span class="wlq_cls">"M12 22a10 10 0 1 1 10-10..."</span>/&gt;
+&lt;/svg&gt;</pre>
+        </div>
+
+        <div class="wlq_console">
+            <h4>PLAYGROUND · SVG 操控台</h4>
+            <div class="wlq_play_stage" id="wlq_play_stage">
+                <i data-lucide="palette"></i>
+            </div>
+            <div class="wlq_ctrl_row">
+                <label>尺寸 size</label>
+                <input type="range" id="wlq_size_range" min="24" max="120" value="72">
+                <output id="wlq_size_out">72px</output>
+            </div>
+            <div class="wlq_ctrl_row">
+                <label>线宽 stroke</label>
+                <input type="range" id="wlq_sw_range" min="0.5" max="3" step="0.25" value="2">
+                <output id="wlq_sw_out">2</output>
+            </div>
+            <div class="wlq_ctrl_row">
+                <label>颜色 color</label>
+                <div class="wlq_swatches" id="wlq_swatches">
+                    <span class="wlq_swatch wlq_picked" data-wlq_color="#ff6347" style="background:#ff6347"></span>
+                    <span class="wlq_swatch" data-wlq_color="#ff8c00" style="background:#ff8c00"></span>
+                    <span class="wlq_swatch" data-wlq_color="#2e8b57" style="background:#2e8b57"></span>
+                    <span class="wlq_swatch" data-wlq_color="#1b1310" style="background:#1b1310"></span>
+                    <span class="wlq_swatch" data-wlq_color="#6f42c1" style="background:#6f42c1"></span>
+                </div>
+            </div>
+            <p class="wlq_play_name">当前图标：<b id="wlq_play_name">palette</b> —— 点击下方任意图标即可更换</p>
+        </div>
+    </section>
+
+    <section class="wlq_zone">
+        <h2 class="wlq_zone_title"><i data-lucide="pen-tool"></i>描边图标墙 <small>STROKE ICONS</small></h2>
+        <p class="wlq_zone_tip">Lucide 图标以 24×24 视窗绘制、2px 描边。点击图标可送入上方操控台。</p>
+        <div class="wlq_icon_grid" id="wlq_icon_grid">
+            <div class="wlq_icon_cell" data-wlq_name="palette"><i data-lucide="palette"></i><b>palette</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="brush"><i data-lucide="brush"></i><b>brush</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="pen-tool"><i data-lucide="pen-tool"></i><b>pen-tool</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="shapes"><i data-lucide="shapes"></i><b>shapes</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="star"><i data-lucide="star"></i><b>star</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="heart"><i data-lucide="heart"></i><b>heart</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="flame"><i data-lucide="flame"></i><b>flame</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="leaf"><i data-lucide="leaf"></i><b>leaf</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="gem"><i data-lucide="gem"></i><b>gem</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="moon"><i data-lucide="moon"></i><b>moon</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="sun"><i data-lucide="sun"></i><b>sun</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="cloud-lightning"><i data-lucide="cloud-lightning"></i><b>cloud-lightning</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="camera"><i data-lucide="camera"></i><b>camera</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="music"><i data-lucide="music"></i><b>music</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="film"><i data-lucide="film"></i><b>film</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="rocket"><i data-lucide="rocket"></i><b>rocket</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="globe"><i data-lucide="globe"></i><b>globe</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="feather"><i data-lucide="feather"></i><b>feather</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="eye"><i data-lucide="eye"></i><b>eye</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="compass"><i data-lucide="compass"></i><b>compass</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="anchor"><i data-lucide="anchor"></i><b>anchor</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="coffee"><i data-lucide="coffee"></i><b>coffee</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="bird"><i data-lucide="bird"></i><b>bird</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="cat"><i data-lucide="cat"></i><b>cat</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="ghost"><i data-lucide="ghost"></i><b>ghost</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="sparkles"><i data-lucide="sparkles"></i><b>sparkles</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="crown"><i data-lucide="crown"></i><b>crown</b></div>
+            <div class="wlq_icon_cell" data-wlq_name="zap"><i data-lucide="zap"></i><b>zap</b></div>
+        </div>
+    </section>
+
+    <section class="wlq_zone">
+        <h2 class="wlq_zone_title"><i data-lucide="git-compare-arrows"></i>两种哲学 <small>FONT vs SVG</small></h2>
+        <div class="wlq_versus">
+            <div class="wlq_versus_card">
+                <h3><i data-lucide="feather"></i>字体图标（iconfont-1）</h3>
+                <ul>
+                    <li>一次 @font-face，全站字形统一加载</li>
+                    <li>写法轻便：一个 class 名即一枚图标</li>
+                    <li>受字体渲染管线约束，多色支持有限</li>
+                    <li>样式只能调 color / font-size / 阴影</li>
+                </ul>
+            </div>
+            <div class="wlq_versus_card wlq_v_svg">
+                <h3><i data-lucide="component"></i>SVG 矢量图标（本页）</h3>
+                <ul>
+                    <li>真矢量路径，任意缩放永远锐利</li>
+                    <li>stroke-width、fill、渐变皆可编程</li>
+                    <li>支持多色、描边动画、CSS 变量驱动</li>
+                    <li>内联即 DOM，可被 JS 逐节点操控</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <footer class="wlq_footer">
+        <strong>WLQ·ATELIER</strong>
+        <span>矢量图标馆 · Lucide（本地 cdn 目录）</span>
+        <span>学号 24002120127 · 王柳晴</span>
+    </footer>
+
+    <div class="wlq_toast" id="wlq_toast"></div>
+
+    <script>
+        // 所有 JS 变量以 wlq_ 开头
+        var wlq_stage = document.getElementById("wlq_play_stage");
+        var wlq_name_out = document.getElementById("wlq_play_name");
+        var wlq_size_range = document.getElementById("wlq_size_range");
+        var wlq_sw_range = document.getElementById("wlq_sw_range");
+        var wlq_size_out = document.getElementById("wlq_size_out");
+        var wlq_sw_out = document.getElementById("wlq_sw_out");
+        var wlq_toast = document.getElementById("wlq_toast");
+        var wlq_timer = null;
+        var wlq_current = "palette";
+
+        // 初次渲染：把所有 <i data-lucide> 替换为内联 SVG
+        lucide.createIcons({ icons: lucide.icons });
+
+        function wlq_render(wlq_name) {
+            wlq_current = wlq_name;
+            wlq_name_out.textContent = wlq_name;
+            wlq_stage.innerHTML = '<i data-lucide="' + wlq_name + '"></i>';
+            lucide.createIcons({ icons: lucide.icons });
+        }
+
+        // 尺寸滑杆
+        wlq_size_range.addEventListener("input", function () {
+            wlq_size_out.textContent = this.value + "px";
+            wlq_stage.style.setProperty("--wlq_size", this.value + "px");
+        });
+
+        // 线宽滑杆
+        wlq_sw_range.addEventListener("input", function () {
+            wlq_sw_out.textContent = this.value;
+            wlq_stage.style.setProperty("--wlq_sw", this.value);
+        });
+
+        // 颜色色板
+        var wlq_swatches = document.querySelectorAll(".wlq_swatch");
+        for (var wlq_i = 0; wlq_i < wlq_swatches.length; wlq_i++) {
+            wlq_swatches[wlq_i].addEventListener("click", function () {
+                for (var wlq_j = 0; wlq_j < wlq_swatches.length; wlq_j++) {
+                    wlq_swatches[wlq_j].classList.remove("wlq_picked");
+                }
+                this.classList.add("wlq_picked");
+                wlq_stage.style.setProperty("--wlq_color", this.getAttribute("data-wlq_color"));
+            });
+        }
+
+        // 图标墙：点击送入操控台
+        var wlq_cells = document.querySelectorAll(".wlq_icon_cell");
+        for (var wlq_k = 0; wlq_k < wlq_cells.length; wlq_k++) {
+            wlq_cells[wlq_k].addEventListener("click", function () {
+                for (var wlq_m = 0; wlq_m < wlq_cells.length; wlq_m++) {
+                    wlq_cells[wlq_m].classList.remove("wlq_picked");
+                }
+                this.classList.add("wlq_picked");
+                var wlq_name = this.getAttribute("data-wlq_name");
+                wlq_render(wlq_name);
+                wlq_toast.textContent = "已送入操控台：" + wlq_name;
+                wlq_toast.classList.add("wlq_show");
+                if (wlq_timer) { clearTimeout(wlq_timer); }
+                wlq_timer = setTimeout(function () {
+                    wlq_toast.classList.remove("wlq_show");
+                }, 1600);
+            });
+        }
+    </script>
+</body>
+
+</html>

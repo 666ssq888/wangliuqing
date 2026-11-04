@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Js函数</title>
+</head>
+<body>
+    <!--写一个随机函数的猜字游戏，计算机随机给出一定范围的随机数，学生输入猜测的数字 计算机给出数字大了或者小了，直到猜中或者到达指定的猜测次数-->
+    <button onclick="gessNum()">猜猜我是几？</button>
+    <script>
+     function gessNum(){
+        let num = Math.floor(Math.random()*100);
+        let count = 0;
+        while(count < 5){
+            let input = prompt("请输入你猜的数字：");
+            input == parseInt(input);
+            if(isNaN(input)){
+                alert("请输入一个有效的数字！");
+                continue;
+            }
+            if(input == num){
+                alert("恭喜你猜对了！");
+                return;
+            }else if(input < num){
+                alert("你猜的数字小了！");
+            }else{
+                alert("你猜的数字大了！");
+            }
+            count++;
+        }
+        alert("很遗憾，你没有猜中，正确答案是：" + num);
+    }
+    //获取从min到max的随机整数，包括min和max
+    //箭头函数
+  var getRandomNum = (min, max) => {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    </script>
+</body>
+</html>

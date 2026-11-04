@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新闻排行榜 | 24002120127 王柳晴</title>
+    <!--
+      作者：王柳晴
+      建立时间：2026-11-04 14:02
+      使用大模型：GLM-5.3-Flash
+      功能名称：新闻排行榜（点击排行/评论排行 选项卡，1:1 还原课堂测试图片 b.jpg）
+    -->
+    <style>
+        /* ============ 全局（王柳晴） ============ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        body {
+            background: #f2f2f2;
+            font-family: SimSun, "宋体", serif;
+            padding: 40px 0;
+        }
+
+        /* 页面标题与返回首页入口（规则要求：新建 html 加入超链接入口到首页 index.html） */
+        .wlq_page_head {
+            width: 380px;
+            margin: 0 auto 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .wlq_page_title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        .wlq_back_home {
+            font-size: 12px;
+            color: #1f4e79;
+        }
+
+        .wlq_back_home:hover {
+            text-decoration: underline;
+        }
+
+        /* ============ 排行榜组件外框（1:1 还原图片：细蓝边框、白底） ============ */
+        .wlq_rank_box {
+            width: 380px;
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid #9dc3e6; /* 图片中的浅蓝细边框 */
+        }
+
+        /* ============ 选项卡标题栏：左右各占一半 ============ */
+        .wlq_rank_tabs {
+            display: flex;
+            border-bottom: 1px solid #9dc3e6;
+        }
+
+        .wlq_rank_tab {
+            flex: 1;
+            text-align: center;
+            padding: 9px 0;
+            font-size: 14px;
+            font-family: "Microsoft YaHei", sans-serif;
+            background: #d9e8f6;  /* 未选中：浅蓝底 */
+            color: #1f4e79;
+            cursor: pointer;
+            user-select: none;
+            transition: background .2s, color .2s;
+        }
+
+        /* 两个选项卡之间的分隔线 */
+        .wlq_rank_tab + .wlq_rank_tab {
+            border-left: 1px solid #9dc3e6;
+        }
+
+        .wlq_rank_tab:hover {
+            background: #c7ddf0;
+        }
+
+        /* 选中状态（JS 切换的就是这个类）：白底黑字加粗，同图片默认「点击排行」 */
+        .wlq_rank_tab.wlq_active {
+            background: #fff;
+            color: #000;
+            font-weight: bold;
+        }
+
+        /* ============ 排行列表（序号 + 标题 + 点击量） ============ */
+        .wlq_rank_panel {
+            display: none;
+        }
+
+        .wlq_rank_panel.wlq_active {
+            display: block;
+        }
+
+        .wlq_rank_list li {
+            display: flex;
+            align-items: center;
+            padding: 7px 10px;
+            font-size: 12px;
+            color: #333;
+            border-bottom: 1px solid #f0f0f0; /* 行与行之间的浅色分隔线 */
+        }
+
+        .wlq_rank_list li:last-child {
+            border-bottom: none;
+        }
+
+        .wlq_rank_list li:hover {
+            background: #f5f9fd;
+        }
+
+        .wlq_rank_list li:hover .wlq_rank_text {
+            text-decoration: underline;
+        }
+
+        /* 左侧序号列 */
+        .wlq_rank_num {
+            width: 24px;
+            flex-shrink: 0;
+            color: #333;
+        }
+
+        /* 中间新闻标题：超长省略号截断 */
+        .wlq_rank_text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 12px;
+        }
+
+        /* 右侧点击量：右对齐、暗红色 */
+        .wlq_rank_count {
+            flex-shrink: 0;
+            color: #b00000;
+        }
+    </style>
+</head>
+<body>
+    <!-- 页头：标题 + 返回首页（王柳晴） -->
+    <div class="wlq_page_head">
+        <span class="wlq_page_title">新闻排行榜</span>
+        <a class="wlq_back_home" href="index.html">← 返回首页</a>
+    </div>
+
+    <!-- 排行榜组件：1:1 还原图片 -->
+    <div class="wlq_rank_box" id="wlq_rankBox">
+        <!-- 选项卡栏：点击排行为默认选中 -->
+        <div class="wlq_rank_tabs" id="wlq_rankTabs">
+            <div class="wlq_rank_tab wlq_active" data-wlq-panel="wlq_panelClick">点击排行</div>
+            <div class="wlq_rank_tab" data-wlq-panel="wlq_panelComment">评论排行</div>
+        </div>
+
+        <!-- 面板一：点击排行（数据与图片一致） -->
+        <div class="wlq_rank_panel wlq_active" id="wlq_panelClick">
+            <ul class="wlq_rank_list">
+                <li><span class="wlq_rank_num">1</span><span class="wlq_rank_text">中国各城市房子还要卖多少年(详细数据)</span><span class="wlq_rank_count">187706</span></li>
+                <li><span class="wlq_rank_num">2</span><span class="wlq_rank_text">任志强：80多年来 我不知道国企给了我们</span><span class="wlq_rank_count">171180</span></li>
+                <li><span class="wlq_rank_num">3</span><span class="wlq_rank_text">三精制药跳楼总裁被查因期间简陋 省食</span><span class="wlq_rank_count">127631</span></li>
+                <li><span class="wlq_rank_num">4</span><span class="wlq_rank_text">内地17省铺开不动产统一登记职责整合工作</span><span class="wlq_rank_count">113865</span></li>
+                <li><span class="wlq_rank_num">5</span><span class="wlq_rank_text">山西煤老板抛售整栋39套二手房 8年投资翻</span><span class="wlq_rank_count">72770</span></li>
+                <li><span class="wlq_rank_num">6</span><span class="wlq_rank_text">北京城南楼市"论跑"变相降价措施加码</span><span class="wlq_rank_count">82971</span></li>
+                <li><span class="wlq_rank_num">7</span><span class="wlq_rank_text">中国3D打印技术取得重大突破 近1200人适</span><span class="wlq_rank_count">27456</span></li>
+                <li><span class="wlq_rank_num">8</span><span class="wlq_rank_text">重磅利空突至全球股指 A股或黑周五无悬</span><span class="wlq_rank_count">25322</span></li>
+                <li><span class="wlq_rank_num">9</span><span class="wlq_rank_text">七匹狼早盘上演奇葩一幕：单笔4手买单刚</span><span class="wlq_rank_count">20912</span></li>
+                <li><span class="wlq_rank_num">10</span><span class="wlq_rank_text">长征小股东主导京东大会 当场媒体董事长</span><span class="wlq_rank_count">11667</span></li>
+            </ul>
+        </div>
+
+        <!-- 面板二：评论排行（图片未展示该面板，按同样式补充示例数据） -->
+        <div class="wlq_rank_panel" id="wlq_panelComment">
+            <ul class="wlq_rank_list">
+                <li><span class="wlq_rank_num">1</span><span class="wlq_rank_text">国土部：不动产登记条例出台无时间表</span><span class="wlq_rank_count">96325</span></li>
+                <li><span class="wlq_rank_num">2</span><span class="wlq_rank_text">专家解读：以房养老为何遇冷</span><span class="wlq_rank_count">87014</span></li>
+                <li><span class="wlq_rank_num">3</span><span class="wlq_rank_text">多地公积金新政频出 刺激刚需入市</span><span class="wlq_rank_count">76892</span></li>
+                <li><span class="wlq_rank_num">4</span><span class="wlq_rank_text">沪指大涨背后的资金流向分析</span><span class="wlq_rank_count">65430</span></li>
+                <li><span class="wlq_rank_num">5</span><span class="wlq_rank_text">一线城市土地出让金再创历史新高</span><span class="wlq_rank_count">58127</span></li>
+                <li><span class="wlq_rank_num">6</span><span class="wlq_rank_text">央企高管降薪细则有望年底出台</span><span class="wlq_rank_count">47586</span></li>
+                <li><span class="wlq_rank_num">7</span><span class="wlq_rank_text">民营银行申请受理开启 首批三家获批</span><span class="wlq_rank_count">39254</span></li>
+                <li><span class="wlq_rank_num">8</span><span class="wlq_rank_text">新预算法通过 地方债管理更透明</span><span class="wlq_rank_count">31207</span></li>
+                <li><span class="wlq_rank_num">9</span><span class="wlq_rank_text">电商大战提前打响 价格欺诈仍存</span><span class="wlq_rank_count">24689</span></li>
+                <li><span class="wlq_rank_num">10</span><span class="wlq_rank_text">网约车定价机制将纳入政府监管</span><span class="wlq_rank_count">18523</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 功能：初始化排行榜选项卡（王柳晴）。
+        // 采用事件委托：把 click 绑定在选项卡栏 wlq_rankTabs 上（包含监听），
+        // 点击时先清除所有选项卡的选中状态，再设置当前元素的选中状态，并切换对应面板。
+        function wlq_initRankTabs() {
+            var wlq_tabsBox = document.getElementById('wlq_rankTabs');
+            wlq_tabsBox.addEventListener('click', function (wlq_e) {
+                var wlq_tab = wlq_e.target.closest('.wlq_rank_tab');
+                if (!wlq_tab) return; // 只处理选项卡本身的点击
+
+                // 第一步：先清除所有选项卡的选中状态
+                var wlq_allTabs = wlq_tabsBox.querySelectorAll('.wlq_rank_tab');
+                for (var wlq_i = 0; wlq_i < wlq_allTabs.length; wlq_i++) {
+                    wlq_allTabs[wlq_i].classList.remove('wlq_active');
+                }
+
+                // 第二步：再设置当前元素的选中状态
+                wlq_tab.classList.add('wlq_active');
+
+                // 同步切换内容面板：先全部隐藏，再显示当前选项卡对应的排行列表
+                var wlq_panels = document.querySelectorAll('.wlq_rank_panel');
+                for (var wlq_j = 0; wlq_j < wlq_panels.length; wlq_j++) {
+                    wlq_panels[wlq_j].classList.remove('wlq_active');
+                }
+                document.getElementById(wlq_tab.getAttribute('data-wlq-panel')).classList.add('wlq_active');
+            });
+        }
+
+        // 页面加载后初始化排行榜选项卡
+        wlq_initRankTabs();
+    </script>
+</body>
+</html>

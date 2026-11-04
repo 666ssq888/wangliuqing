@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WLQ·ATELIER | 首页 | 24002120127 王柳晴</title>
+    <style>
+        /* ============ 全局（延续 flex_css005.css 的全局写法） ============ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --wlq_ink: #1b1310;        /* 深咖墨色 */
+            --wlq_paper: #f8f1e4;      /* 暖纸色 */
+            --wlq_cream: #fffaef;      /* 奶油白 */
+            --wlq_vermilion: #ff6347;  /* 朱砂红（沿用原练习渐变色1） */
+            --wlq_amber: #ff8c00;      /* 琥珀橙（沿用原练习渐变色3） */
+            --wlq_moss: #2e8b57;       /* 苔绿（沿用原练习渐变色2） */
+            --wlq_grad: linear-gradient(135deg, var(--wlq_vermilion), var(--wlq_amber));
+            --wlq_display_font: Georgia, "Times New Roman", "STZhongsong", "KaiTi", serif;
+            --wlq_body_font: "Segoe UI", "Microsoft YaHei", sans-serif;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        body {
+            background: var(--wlq_paper);
+            color: var(--wlq_ink);
+            font-family: var(--wlq_body_font);
+            /* 纸张颗粒质感 */
+            background-image: radial-gradient(rgba(27, 19, 16, .05) 1px, transparent 1px);
+            background-size: 22px 22px;
+            overflow-x: hidden;
+        }
+
+        @keyframes wlq_fade_up {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes wlq_marquee {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+
+        @keyframes wlq_float {
+            0%, 100% { transform: translateY(0) rotate(8deg); }
+            50%      { transform: translateY(-18px) rotate(14deg); }
+        }
+
+        @keyframes wlq_spin_slow {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============ 案例一：flex 导航布局 ============ */
+        .wlq_nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--wlq_ink);
+            color: var(--wlq_cream);
+            padding: 14px 4vw;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 3px solid var(--wlq_vermilion);
+        }
+
+        .wlq_logo {
+            font-family: var(--wlq_display_font);
+            font-size: 26px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .wlq_logo em {
+            font-style: normal;
+            background: var(--wlq_grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .wlq_nav_list {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .wlq_nav_list a {
+            color: var(--wlq_cream);
+            font-size: 15px;
+            padding: 9px 16px;
+            border-radius: 999px;
+            transition: background .25s, color .25s;
+        }
+
+        .wlq_nav_list a:hover {
+            background: rgba(255, 250, 239, .16);
+        }
+
+        .wlq_nav_list a.wlq_active {
+            background: var(--wlq_grad);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* ============ 首屏 HERO（flex 双栏） ============ */
+        .wlq_hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 40px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 72px 24px 56px;
+            flex-wrap: wrap;
+        }
+
+        .wlq_hero_text {
+            flex: 1 1 460px;
+            animation: wlq_fade_up .8s ease both;
+        }
+
+        .wlq_hero_kicker {
+            display: inline-block;
+            font-size: 13px;
+            letter-spacing: 6px;
+            padding: 6px 14px;
+            border: 1.5px solid var(--wlq_ink);
+            border-radius: 999px;
+            margin-bottom: 22px;
+        }
+
+        .wlq_hero_title {
+            font-family: var(--wlq_display_font);
+            font-size: clamp(44px, 7vw, 84px);
+            line-height: 1.08;
+            letter-spacing: 2px;
+        }
+
+        .wlq_hero_title span {
+            background: var(--wlq_grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-style: italic;
+        }
+
+        .wlq_hero_sub {
+            margin-top: 18px;
+            font-size: 17px;
+            color: #5c4a3d;
+            max-width: 46ch;
+            line-height: 1.9;
+        }
+
+        .wlq_hero_btns {
+            display: flex;
+            gap: 14px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .wlq_btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 26px;
+            border-radius: 999px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform .25s, box-shadow .25s;
+        }
+
+        .wlq_btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .wlq_btn_primary {
+            background: var(--wlq_grad);
+            color: #fff;
+            box-shadow: 0 10px 24px rgba(255, 99, 71, .35);
+        }
+
+        .wlq_btn_ghost {
+            border: 2px solid var(--wlq_ink);
+            color: var(--wlq_ink);
+        }
+
+        .wlq_btn_ghost:hover {
+            background: var(--wlq_ink);
+            color: var(--wlq_cream);
+        }
+
+        /* 右侧艺术装饰块（纯 CSS 图形） */
+        .wlq_hero_art {
+            flex: 0 1 300px;
+            height: 300px;
+            position: relative;
+            animation: wlq_fade_up .8s .15s ease both;
+        }
+
+        .wlq_art_disc {
+            position: absolute;
+            inset: 12% 18%;
+            border-radius: 50%;
+            background: var(--wlq_grad);
+            box-shadow: 0 24px 60px rgba(255, 140, 0, .35);
+        }
+
+        .wlq_art_ring {
+            position: absolute;
+            inset: 0;
+            border: 2px dashed var(--wlq_ink);
+            border-radius: 50%;
+            animation: wlq_spin_slow 26s linear infinite;
+        }
+
+        .wlq_art_square {
+            position: absolute;
+            right: -6px;
+            top: -6px;
+            width: 92px;
+            height: 92px;
+            border: 2px solid var(--wlq_ink);
+            background: var(--wlq_moss);
+            animation: wlq_float 5s ease-in-out infinite;
+        }
+
+        .wlq_art_dot {
+            position: absolute;
+            left: 4px;
+            bottom: 2px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--wlq_ink);
+        }
+
+        /* ============ 跑马灯横幅 ============ */
+        .wlq_marquee {
+            background: var(--wlq_ink);
+            color: var(--wlq_paper);
+            overflow: hidden;
+            padding: 14px 0;
+            border-top: 3px solid var(--wlq_vermilion);
+            border-bottom: 3px solid var(--wlq_vermilion);
+            font-family: var(--wlq_display_font);
+            font-size: 20px;
+            letter-spacing: 4px;
+            white-space: nowrap;
+        }
+
+        .wlq_marquee_track {
+            display: inline-flex;
+            animation: wlq_marquee 22s linear infinite;
+        }
+
+        .wlq_marquee_track span {
+            padding: 0 28px;
+        }
+
+        .wlq_marquee_track i {
+            color: var(--wlq_amber);
+            font-style: normal;
+            padding: 0 4px;
+        }
+
+        /* ============ 案例二：三等分特性栏 ============ */
+        .wlq_features {
+            display: flex;
+            gap: 20px;
+            max-width: 1100px;
+            margin: 64px auto 0;
+            padding: 0 24px;
+            flex-wrap: wrap;
+        }
+
+        .wlq_feature {
+            flex: 1 1 240px;
+            background: var(--wlq_cream);
+            border: 2px solid var(--wlq_ink);
+            border-radius: 16px;
+            padding: 28px 24px;
+            box-shadow: 6px 6px 0 var(--wlq_ink);
+            transition: transform .25s, box-shadow .25s;
+            animation: wlq_fade_up .7s ease both;
+        }
+
+        .wlq_feature:nth-child(2) { animation-delay: .1s; }
+        .wlq_feature:nth-child(3) { animation-delay: .2s; }
+
+        .wlq_feature:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: 10px 10px 0 var(--wlq_vermilion);
+        }
+
+        .wlq_feature_no {
+            font-family: var(--wlq_display_font);
+            font-size: 44px;
+            font-weight: bold;
+            background: var(--wlq_grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .wlq_feature h3 {
+            font-size: 21px;
+            margin: 10px 0 8px;
+        }
+
+        .wlq_feature p {
+            font-size: 14.5px;
+            line-height: 1.85;
+            color: #5c4a3d;
+        }
+
+        /* ============ 案例三：flex 响应式作品卡片网格 ============ */
+        .wlq_gallery {
+            max-width: 1100px;
+            margin: 70px auto 0;
+            padding: 0 24px;
+        }
+
+        .wlq_section_title {
+            font-family: var(--wlq_display_font);
+            font-size: 34px;
+            display: flex;
+            align-items: baseline;
+            gap: 14px;
+            margin-bottom: 26px;
+        }
+
+        .wlq_section_title small {
+            font-size: 14px;
+            letter-spacing: 3px;
+            color: #8a7360;
+        }
+
+        .wlq_card_grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .wlq_card {
+            flex: 1 1 300px;
+            background: var(--wlq_cream);
+            border: 2px solid var(--wlq_ink);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform .28s, box-shadow .28s;
+        }
+
+        .wlq_card:hover {
+            transform: translateY(-6px) rotate(-.4deg);
+            box-shadow: 0 16px 34px rgba(27, 19, 16, .18);
+        }
+
+        .wlq_card_cover {
+            height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--wlq_display_font);
+            font-size: 46px;
+            color: #fff;
+            border-bottom: 2px solid var(--wlq_ink);
+        }
+
+        .wlq_cover_a { background: var(--wlq_grad); }
+        .wlq_cover_b { background: var(--wlq_ink); }
+        .wlq_cover_c { background: var(--wlq_moss); }
+        .wlq_cover_d { background: linear-gradient(135deg, var(--wlq_amber), var(--wlq_moss)); }
+
+        .wlq_card_body {
+            padding: 18px 20px 20px;
+        }
+
+        .wlq_card_tag {
+            display: inline-block;
+            font-size: 12px;
+            letter-spacing: 2px;
+            padding: 4px 12px;
+            border: 1.5px solid var(--wlq_vermilion);
+            color: var(--wlq_vermilion);
+            border-radius: 999px;
+            margin-bottom: 10px;
+        }
+
+        .wlq_card_body h3 {
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+
+        .wlq_card_body p {
+            font-size: 14px;
+            color: #6b584a;
+            line-height: 1.8;
+        }
+
+        /* ============ 页脚 ============ */
+        .wlq_footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            max-width: 1100px;
+            margin: 80px auto 0;
+            padding: 26px 24px 40px;
+            border-top: 2px dashed rgba(27, 19, 16, .35);
+            font-size: 14px;
+            color: #6b584a;
+        }
+
+        .wlq_footer strong {
+            font-family: var(--wlq_display_font);
+            font-size: 18px;
+            color: var(--wlq_ink);
+        }
+
+        @media (max-width: 640px) {
+            .wlq_nav { flex-direction: column; gap: 10px; }
+            .wlq_hero { padding-top: 44px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 学号：24002120127 姓名：王柳晴 -->
+
+    <!-- 案例一：flex 导航布局 -->
+    <nav class="wlq_nav">
+        <a href="index.html" class="wlq_logo">WLQ<em>·ATELIER</em></a>
+        <ul class="wlq_nav_list">
+            <li><a class="wlq_active" href="index.html">首页</a></li>
+            <li><a href="iconfont-1.html">字体图标</a></li>
+            <li><a href="iconfont-2.html">矢量图标</a></li>
+            <li><a href="svg005.html">SVG符号</a></li>
+            <li><a href="flex布局复习.html">Flex复习</a></li>
+            <li><a href="tab-news.html">新闻选项卡</a></li>
+            <li><a href="news-rank.html">新闻排行</a></li>
+        </ul>
+    </nav>
+
+    <!-- 首屏：flex 双栏 -->
+    <header class="wlq_hero">
+        <div class="wlq_hero_text">
+            <span class="wlq_hero_kicker">高级网页设计 · 课程实验场</span>
+            <h1 class="wlq_hero_title">图标、<br>排版与<span>布局</span>的<br>艺术实验。</h1>
+            <p class="wlq_hero_sub">这里陈列字体图标与矢量图标的两种哲学：一个把图形铸进字库，一个用线条勾勒世界。所有版面皆以 Flex 布局编织而成。</p>
+            <div class="wlq_hero_btns">
+                <a class="wlq_btn wlq_btn_primary" href="iconfont-1.html">字体图标馆</a>
+                <a class="wlq_btn wlq_btn_ghost" href="iconfont-2.html">矢量图标馆</a>
+            </div>
+        </div>
+        <div class="wlq_hero_art">
+            <div class="wlq_art_disc"></div>
+            <div class="wlq_art_ring"></div>
+            <div class="wlq_art_square"></div>
+            <div class="wlq_art_dot"></div>
+        </div>
+    </header>
+
+    <!-- 跑马灯 -->
+    <div class="wlq_marquee">
+        <div class="wlq_marquee_track">
+            <span>FONT ICONS <i>◆</i> SVG VECTORS <i>◆</i> FLEX LAYOUT <i>◆</i> ART BRANDING <i>◆</i> FONT ICONS <i>◆</i> SVG VECTORS <i>◆</i> FLEX LAYOUT <i>◆</i> ART BRANDING <i>◆</i></span>
+            <span>FONT ICONS <i>◆</i> SVG VECTORS <i>◆</i> FLEX LAYOUT <i>◆</i> ART BRANDING <i>◆</i> FONT ICONS <i>◆</i> SVG VECTORS <i>◆</i> FLEX LAYOUT <i>◆</i> ART BRANDING <i>◆</i></span>
+        </div>
+    </div>
+
+    <!-- 案例二：三等分特性栏 -->
+    <section class="wlq_features">
+        <div class="wlq_feature">
+            <div class="wlq_feature_no">01</div>
+            <h3>图标即字体</h3>
+            <p>Font Awesome 把图标铸成字形，@font-face 加载字库，一个 class 名即可点亮一枚图形，缩放如文字般顺滑。</p>
+        </div>
+        <div class="wlq_feature">
+            <div class="wlq_feature_no">02</div>
+            <h3>图标即矢量</h3>
+            <p>Lucide 以 SVG 描边作画，线条粗细、颜色、尺寸皆可随 CSS 自由调度，是像素级掌控者的画笔。</p>
+        </div>
+        <div class="wlq_feature">
+            <div class="wlq_feature_no">03</div>
+            <h3>布局即骨架</h3>
+            <p>导航、三等分、卡片网格、侧边栏——所有展陈空间都由 Flex 容器与主轴交叉轴编排而成。</p>
+        </div>
+    </section>
+
+    <!-- 案例三：flex 响应式卡片网格 -->
+    <section class="wlq_gallery">
+        <h2 class="wlq_section_title">作品陈列 <small>SELECTED WORKS</small></h2>
+        <div class="wlq_card_grid">
+            <a class="wlq_card" href="iconfont-1.html">
+                <div class="wlq_card_cover wlq_cover_a">Fa</div>
+                <div class="wlq_card_body">
+                    <span class="wlq_card_tag">FONT ICON</span>
+                    <h3>字体图标馆</h3>
+                    <p>Font Awesome 6 · 实心 / 常规 / 品牌三大字体族，动效图标一网打尽。</p>
+                </div>
+            </a>
+            <a class="wlq_card" href="iconfont-2.html">
+                <div class="wlq_card_cover wlq_cover_b">Lu</div>
+                <div class="wlq_card_body">
+                    <span class="wlq_card_tag">SVG VECTOR</span>
+                    <h3>矢量图标馆</h3>
+                    <p>Lucide 描边图标，SVG 方式渲染，线宽与颜色随 CSS 实时变化。</p>
+                </div>
+            </a>
+            <a class="wlq_card" href="svg005.html">
+                <div class="wlq_card_cover wlq_cover_c">Svg</div>
+                <div class="wlq_card_body">
+                    <span class="wlq_card_tag">SYMBOL</span>
+                    <h3>SVG 符号练习</h3>
+                    <p>阿里 iconfont 的 symbol 引用方式，点击切换高亮的标签栏案例。</p>
+                </div>
+            </a>
+            <a class="wlq_card" href="flex布局复习.html">
+                <div class="wlq_card_cover wlq_cover_d">Fx</div>
+                <div class="wlq_card_body">
+                    <span class="wlq_card_tag">LAYOUT</span>
+                    <h3>Flex 布局复习</h3>
+                    <p>导航、三等分、卡片网格、侧边栏——本站骨架的灵感原点。</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="wlq_footer">
+        <strong>WLQ·ATELIER</strong>
+        <span>学号 24002120127 · 王柳晴</span>
+        <span id="wlq_year"></span>
+    </footer>
+
+    <script>
+        // 所有 JS 变量以 wlq_ 开头
+        var wlq_now = new Date();
+        var wlq_year_el = document.getElementById("wlq_year");
+        wlq_year_el.textContent = "© " + wlq_now.getFullYear() + " 高级网页设计课程作业";
+    </script>
+</body>
+
+</html>
