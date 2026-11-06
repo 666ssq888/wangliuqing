@@ -160,3 +160,13 @@ gitee私人令牌 （已脱敏，现存放于 Windows 凭据管理器）
 **执行说明：** 按 commit-github skill 执行：暂存 swiper/demo/swiper-task.html（图片路径修正+4 个任务补全）、swiper/swiper-imgs/（5 张大国重器图片）、wlq_prompt.md→commit→push 到 github.com/666ssq888/wangliuqing（SSH 公钥认证）。Swiper 官方库源码与官方 demo（共约 380 个文件）与作业无关且页面走 CDN 引入，未提交。
 
 ---
+
+## 2026-11-06 14:53 | 模型：GLM-5.3-Flash
+
+**提示词内容：**
+
+你只需要把 swiper/demo/swiper-task.html 这个代码提交到GitHub，按照之前的规则将今天新增的Html文件加到 24002120127_王柳晴 下，然后一并打包提交到GitHub
+
+**执行说明：** ① 复制 swiper-task.html 到个人作品集目录 24002120127_王柳晴/index.html/ 下，并按规则在文件头补充姓名注释（作者/建立时间/大模型/功能名称）；② 复制 swiper-imgs/（5 张图）到 24002120127_王柳晴/ 下，使 ../swiper-imgs/ 相对路径继续可用；③ 首页导航加入口；④ 一并 commit→push 到 github.com/666ssq888/wangliuqing。
+
+---
