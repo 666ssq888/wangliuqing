@@ -130,3 +130,33 @@ gitee私人令牌 （已脱敏，现存放于 Windows 凭据管理器）
 **执行说明：** 按 commit-github skill 执行：审查变更→暂存本次新增的 tab-news.html、js/tab.js、news-rank.html 及修改的 index.html、wlq_prompt.md→commit→push 到 github.com/666ssq888/wangliuqing（SSH 公钥认证，走 ssh.github.com:443）。
 
 ---
+
+## 2026-11-04 14:33 | 模型：GLM-5.3-Flash
+
+**提示词内容：**
+
+在GitHub上进行发布并且获取发布地址
+
+**执行说明：** 通过 GitHub Pages 发布：把站点目录（24002120127_王柳晴/index.html/）内容以孤儿分支 gh-pages 推送到仓库根，再开通 Pages（源=gh-pages 分支根目录），发布地址形如 https://666ssq888.github.io/wangliuqing/ 。
+
+---
+
+## 2026-11-06 14:43 | 模型：GLM-5.3-Flash
+
+**提示词内容：**
+
+（上一步）将 swiper/demo/swiper-task.html 代码里的照片替换成 swiper/swiper-imgs 里的图片；（本步）把任务补全
+
+**执行说明：** ① 图片路径 20 处全部改为 ../swiper-imgs/（浏览器实测全部 200）；② 补全 swiper-task.html 学生作答区 4 个任务：任务1 最小轮播初始化 #wySw1；任务2 #wySw2 循环+600ms+圆点可点+箭头；任务3 #wySw3 循环+2.6s 自动播放+拖动不停+圆点；任务4 #wySw4 循环+3.2s 自动播放+圆点+初始 slide/800ms，进阶用封装函数实现按钮销毁重建切换 6 种效果。选择器由 wlq_ 修正为 HTML 实际的 wy_ 系列 id，新加 JS 变量按规则以 wlq_ 开头，函数加功能注释。
+
+---
+
+## 2026-11-06 14:50 | 模型：GLM-5.3-Flash
+
+**提示词内容：**
+
+好的，提交到 GitHub
+
+**执行说明：** 按 commit-github skill 执行：暂存 swiper/demo/swiper-task.html（图片路径修正+4 个任务补全）、swiper/swiper-imgs/（5 张大国重器图片）、wlq_prompt.md→commit→push 到 github.com/666ssq888/wangliuqing（SSH 公钥认证）。Swiper 官方库源码与官方 demo（共约 380 个文件）与作业无关且页面走 CDN 引入，未提交。
+
+---
