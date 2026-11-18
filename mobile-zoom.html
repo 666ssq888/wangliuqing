@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>图片查看器：双指缩放 + 双击放大 + 拖动</title>
+<!--
+  作者：王柳晴  学号：24002120127
+  建立时间：2026-11-18
+  使用大模型：GLM-5.3-Flash
+  功能名称：任务三 移动端图片查看器——双指捏合缩放(1~4倍、以两指中点为基准)、
+            双击在 1x/2x 间切换(0.25s 过渡)、单指拖动看细节、松手/缩回限制在边界内
+  类名 / id / JS 变量一律以 wlq_ 开头
+-->
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { background: #0c0e12; color: #fff; font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif; overflow: hidden; }
+
+  /* ===== 查看器容器：overflow:hidden + touch-action:none + user-select:none ===== */
+  .wlq_view {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    touch-action: none;       /* 禁止浏览器默认手势，交给 JS 处理 */
+    user-select: none;
+    -webkit-user-select: none;
+    background: #000;
+  }
+
+  /* ===== 大图：1x 时正好铺满容器，transform-origin 定在左上角，位移用 translate 计算 ===== */
+  .wlq_img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform-origin: 0 0;
+    will-change: transform;
+    pointer-events: none;
+  }
+  /* 双击切换时的 0.25s 过渡动画（平时拖动/捏合不加过渡，保证跟手） */
+  .wlq_img.wlq_anim { transition: transform .25s ease; }
+
+  /* ===== 顶部提示条：页面打开时提示"双指缩放请用手机打开" ===== */
+  .wlq_tip {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 10;
+    padding: 12px 16px calc(12px + env(safe-area-inset-top));
+    text-align: center;
+    font-size: 13.5px;
+    letter-spacing: 1px;
+    color: #ffe08a;
+    background: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.35) 80%, transparent);
+    pointer-events: none;
+  }
+  .wlq_tip b { color: #fff; }
+
+  /* ===== 底部状态栏：当前倍数 ===== */
+  .wlq_status {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 10;
+    padding: 14px 0 calc(14px + env(safe-area-inset-bottom));
+    text-align: center;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,.85);
+    background: linear-gradient(transparent, rgba(0,0,0,.55));
+    pointer-events: none;
+  }
+  .wlq_status b { color: #ffd166; font-size: 18px; }
+</style>
+</head>
+<body>
+
+  <!-- 提示条 -->
+  <div class="wlq_tip">📱 双指缩放请用手机打开 · 双击图片可在 <b>1x / 2x</b> 间切换 · 单指拖动看细节</div>
+
+  <!-- 查看器容器 -->
+  <div class="wlq_view" id="wlq_view">
+    <img class="wlq_img" id="wlq_img" draggable="false"
+         src="https://trae-api-cn.mchost.guru/api/ide/v1/tool_text_to_image?prompt=Ultra%20realistic%20photography%20of%20a%20majestic%20Chinese%20mountain%20landscape%20with%20sea%20of%20clouds%2C%20golden%20sunrise%2C%20ancient%20stone%20pavilion%20on%20the%20peak%2C%20mist%20between%20cliffs%2C%20high%20detail%2C%20cinematic%20lighting&image_size=landscape_16_9"
+         alt="山水大图">
+  </div>
+
+  <!-- 状态栏 -->
+  <div class="wlq_status">当前倍数：<b id="wlq_zoom">1.0</b>x</div>
+
+<script>
+  /* ================= 变量一律以 wlq_ 开头 ================= */
+
+  var wlq_view = document.getElementById("wlq_view");   // 容器
+  var wlq_img  = document.getElementById("wlq_img");    // 大图
+  var wlq_zoomEl = document.getElementById("wlq_zoom"); // 倍数显示
+
+  var wlq_cw = 0, wlq_ch = 0;        // 容器尺寸（旋转屏幕 / resize 时刷新）
+
+  var wlq_scale = 1;                 // 当前倍数（1 ~ 4）
+  var wlq_tx = 0, wlq_ty = 0;        // 当前位移（transform-origin: 0 0 配合 translate）
+
+  var wlq_mode = 0;                  // 当前手势：0 无 / 1 单指 / 2 双指
+  var wlq_startScale = 1;            // 手势开始时的快照（缩放不跳变的关键）
+  var wlq_startTx = 0, wlq_startTy = 0;
+  var wlq_startDist = 0;             // 双指初始距离
+  var wlq_startMidX = 0, wlq_startMidY = 0;   // 双指初始中点
+  var wlq_startX = 0, wlq_startY = 0;         // 单指起点
+
+  var wlq_minScale = 1, wlq_maxScale = 4;     // 缩放边界（带阻尼限制）
+  var wlq_animTimer = null;          // 过渡动画移除定时器
+  var wlq_lastTapTime = 0;           // 上一次抬起时间（双击判定）
+  var wlq_lastTapX = 0, wlq_lastTapY = 0;
+  var wlq_touchDblTime = 0;          // 自定义双击触发时间（防止 dblclick 二次触发）
+
+  /* ---------- 工具函数 ---------- */
+
+  // 刷新容器尺寸
+  function wlq_measure() {
+    var rect = wlq_view.getBoundingClientRect();
+    wlq_cw = rect.width;
+    wlq_ch = rect.height;
+  }
+
+  // 两指间距离
+  function wlq_dist(t1, t2) {
+    var dx = t1.clientX - t2.clientX;
+    var dy = t1.clientY - t2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  // 两指中点（换算成容器内坐标）
+  function wlq_mid(t1, t2) {
+    var rect = wlq_view.getBoundingClientRect();
+    return {
+      x: (t1.clientX + t2.clientX) / 2 - rect.left,
+      y: (t1.clientY + t2.clientY) / 2 - rect.top
+    };
+  }
+
+  // 把位移限制在边界内：图片任何一边都不允许离开容器（scale=1 时位移范围为 0，拖不出边界）
+  function wlq_clamp() {
+    var minX = wlq_cw - wlq_cw * wlq_scale;   // ≤ 0
+    var minY = wlq_ch - wlq_ch * wlq_scale;   // ≤ 0
+    if (wlq_tx > 0) wlq_tx = 0;
+    if (wlq_tx < minX) wlq_tx = minX;
+    if (wlq_ty > 0) wlq_ty = 0;
+    if (wlq_ty < minY) wlq_ty = minY;
+  }
+
+  // 应用 transform 到图片
+  function wlq_apply() {
+    wlq_img.style.transform =
+      "translate(" + wlq_tx + "px," + wlq_ty + "px) scale(" + wlq_scale + ")";
+    wlq_zoomEl.textContent = wlq_scale.toFixed(1);
+  }
+
+  // 双击 / 双触切换 1x ↔ 2x（带 0.25s 过渡；缩回 1x 自动居中）
+  function wlq_toggleZoom() {
+    wlq_img.classList.add("wlq_anim");
+    clearTimeout(wlq_animTimer);
+    wlq_animTimer = setTimeout(function () {
+      wlq_img.classList.remove("wlq_anim");
+    }, 260);
+
+    if (wlq_scale > 1) {
+      // 缩回 1x，位移归零 = 自动居中
+      wlq_scale = 1;
+      wlq_tx = 0;
+      wlq_ty = 0;
+    } else {
+      // 放大到 2x，以容器中心为基准
+      wlq_setScale(2, wlq_cw / 2, wlq_ch / 2);
+    }
+    wlq_apply();
+  }
+
+  // 以指定点为基准设置倍数：点在图上的位置保持不动（保证缩放不跳变的核心公式）
+  function wlq_setScale(newScale, cx, cy) {
+    // 限制在 1 ~ 4 倍之间（边界阻尼：超出直接贴边）
+    if (newScale < wlq_minScale) newScale = wlq_minScale;
+    if (newScale > wlq_maxScale) newScale = wlq_maxScale;
+
+    // 变换前：屏幕点 cx = tx + k * oldScale  →  图内坐标 p = (cx - tx) / oldScale
+    // 变换后要求同一点仍在 cx：newTx = cx - (newScale / oldScale) * (cx - oldTx)
+    var k = newScale / wlq_scale;
+    wlq_tx = cx - k * (cx - wlq_tx);
+    wlq_ty = cy - k * (cy - wlq_ty);
+    wlq_scale = newScale;
+    wlq_clamp();
+  }
+
+  /* ---------- 手势监听 ---------- */
+
+  // 2. touchstart：记录单指/双指状态与双指初始距离
+  wlq_view.addEventListener("touchstart", function (e) {
+    wlq_measure();
+    // 新手势开始，关闭过渡动画（保证捏合跟手）
+    wlq_img.classList.remove("wlq_anim");
+    clearTimeout(wlq_animTimer);
+
+    if (e.touches.length === 2) {
+      // 双指：快照初始距离、中点、当前缩放与位移
+      wlq_mode = 2;
+      wlq_startDist  = wlq_dist(e.touches[0], e.touches[1]);
+      var mid = wlq_mid(e.touches[0], e.touches[1]);
+      wlq_startMidX = mid.x;
+      wlq_startMidY = mid.y;
+      wlq_startScale = wlq_scale;
+      wlq_startTx = wlq_tx;
+      wlq_startTy = wlq_ty;
+    } else if (e.touches.length === 1) {
+      // 单指：记录起点与当前位移
+      wlq_mode = 1;
+      var rect = wlq_view.getBoundingClientRect();
+      wlq_startX = e.touches[0].clientX - rect.left;
+      wlq_startY = e.touches[0].clientY - rect.top;
+      wlq_startTx = wlq_tx;
+      wlq_startTy = wlq_ty;
+    }
+  }, { passive: false });
+
+  // 3. touchmove：双指按距离比例缩放（以两指中点为基准）；单指拖动
+  wlq_view.addEventListener("touchmove", function (e) {
+    e.preventDefault();   // touch-action:none 之外再兜底，防止页面跟手滚动
+
+    if (e.touches.length === 2 && wlq_mode === 2) {
+      // 距离比例 → 新倍数（始终以手势开始时的快照为基准，不累加，故不会跳变）
+      var dist = wlq_dist(e.touches[0], e.touches[1]);
+      var ratio = dist / wlq_startDist;
+      var newScale = wlq_startScale * ratio;
+
+      // 当前两指中点
+      var mid = wlq_mid(e.touches[0], e.touches[1]);
+
+      // 以"手势开始时中点对应的图上位置"为不动点：
+      // 快照时中点 startMid 在图上的坐标 p = (startMid - startT) / startScale
+      // 缩放后要求该点仍在当前中点 mid 处：newT = mid - (newScale / startScale) * (mid - startT)
+      var k = newScale / wlq_startScale;
+      wlq_tx = mid.x - k * (mid.x - wlq_startTx);
+      wlq_ty = mid.y - k * (mid.y - wlq_startTy);
+      wlq_scale = newScale;
+      wlq_clamp();
+      wlq_apply();
+
+    } else if (e.touches.length === 1 && wlq_mode <= 1) {
+      // 单指拖动：跟随手指，位移实时夹在边界内
+      var rect = wlq_view.getBoundingClientRect();
+      wlq_tx = wlq_startTx + (e.touches[0].clientX - rect.left - wlq_startX);
+      wlq_ty = wlq_startTy + (e.touches[0].clientY - rect.top - wlq_startY);
+      wlq_clamp();
+      wlq_apply();
+    }
+  }, { passive: false });
+
+  // 4/5. touchend：处理双击判定 & 剩余手指状态恢复
+  wlq_view.addEventListener("touchend", function (e) {
+    // 双击判定：单指、位移极小、两次抬起间隔 < 300ms
+    if (wlq_mode === 1 && e.changedTouches.length === 1) {
+      var rect = wlq_view.getBoundingClientRect();
+      var x = e.changedTouches[0].clientX - rect.left;
+      var y = e.changedTouches[0].clientY - rect.top;
+      var moved = Math.abs(x - wlq_lastTapX) + Math.abs(y - wlq_lastTapY);
+      var now = Date.now();
+
+      if (now - wlq_lastTapTime < 300 && moved < 20) {
+        wlq_toggleZoom();          // 双击：1x ↔ 2x，0.25s 过渡
+        wlq_touchDblTime = now;    // 标记，避免桌面 dblclick 再切换一次
+        wlq_lastTapTime = 0;
+      } else {
+        wlq_lastTapTime = now;
+        wlq_lastTapX = x;
+        wlq_lastTapY = y;
+      }
+    }
+
+    // 手指抬起后按剩余手指数量恢复手势状态（双指变单指继续拖、全部抬起则归零）
+    wlq_mode = e.touches.length === 2 ? 2 : (e.touches.length === 1 ? 1 : 0);
+    if (wlq_mode === 2) {
+      // 剩余双指：重新快照，保证继续捏合仍以当前状态为基准、不跳变
+      wlq_startDist = wlq_dist(e.touches[0], e.touches[1]);
+      var mid = wlq_mid(e.touches[0], e.touches[1]);
+      wlq_startMidX = mid.x;
+      wlq_startMidY = mid.y;
+      wlq_startScale = wlq_scale;
+      wlq_startTx = wlq_tx;
+      wlq_startTy = wlq_ty;
+    } else if (wlq_mode === 1) {
+      // 剩止单指：重新快照拖动起点
+      var rect2 = wlq_view.getBoundingClientRect();
+      wlq_startX = e.touches[0].clientX - rect2.left;
+      wlq_startY = e.touches[0].clientY - rect2.top;
+      wlq_startTx = wlq_tx;
+      wlq_startTy = wlq_ty;
+    }
+  });
+
+  // 桌面端双击鼠标也可切换（手机上由自定义双击处理，这里做了去重）
+  wlq_view.addEventListener("dblclick", function (e) {
+    if (Date.now() - wlq_touchDblTime < 400) return;
+    wlq_measure();
+    wlq_toggleZoom();
+  });
+
+  // 旋转屏幕 / 改变窗口：状态不丢失，只重新校准容器尺寸并把位移夹回边界
+  window.addEventListener("resize", function () {
+    wlq_measure();
+    wlq_clamp();
+    wlq_apply();
+  });
+  window.addEventListener("orientationchange", function () {
+    setTimeout(function () {
+      wlq_measure();
+      wlq_clamp();
+      wlq_apply();
+    }, 200);
+  });
+
+  /* 初始化 */
+  wlq_measure();
+  wlq_apply();
+</script>
+</body>
+</html>

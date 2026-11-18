@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>摇一摇彩蛋：摇出今日菜谱</title>
+<!--
+  作者：王柳晴  学号：24002120127
+  建立时间：2026-11-18
+  使用大模型：GLM-5.3-Flash
+  功能名称：任务四 摇一摇彩蛋——监听 devicemotion，用 accelerationIncludingGravity
+            计算合成加速度，超过阈值 18 判定为摇动；1.5s 冷却防重复触发；
+            不支持传感器的设备显示提示并提供"点我抽一次"按钮降级方案
+  类名 / id / JS 变量一律以 wlq_ 开头
+-->
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    background: linear-gradient(160deg, #1a2340, #0e1526 60%, #090d18);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px 20px;
+    overflow: hidden;
+  }
+
+  /* ===== 顶部信息 ===== */
+  .wlq_head { font-size: 13px; letter-spacing: 2px; color: rgba(255,255,255,.55); margin-bottom: 30px; }
+  .wlq_title { font-size: 30px; letter-spacing: 5px; margin-bottom: 10px; }
+  .wlq_hint  { font-size: 16px; color: #ffe08a; letter-spacing: 2px; animation: wlq_shake_tip 1.6s ease-in-out infinite; }
+  @keyframes wlq_shake_tip {
+    0%, 100% { transform: rotate(0deg); }
+    20% { transform: rotate(-6deg); }
+    40% { transform: rotate(6deg); }
+    60% { transform: rotate(-4deg); }
+    80% { transform: rotate(4deg); }
+  }
+
+  /* ===== 结果卡片：弹出动画 ===== */
+  .wlq_card {
+    margin-top: 34px;
+    width: 100%;
+    max-width: 380px;
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 22px;
+    padding: 34px 26px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 14px 40px rgba(0,0,0,.4);
+  }
+  .wlq_label { font-size: 13px; letter-spacing: 3px; color: rgba(255,255,255,.55); }
+  .wlq_dish  { font-size: 34px; letter-spacing: 4px; margin-top: 12px; color: #ffd166; }
+  .wlq_emoji { font-size: 58px; margin-top: 16px; }
+  .wlq_desc  { font-size: 14px; color: rgba(255,255,255,.75); line-height: 1.9; margin-top: 14px; min-height: 28px; }
+
+  /* 弹出动画：放大回弹 */
+  .wlq_pop { animation: wlq_pop .45s cubic-bezier(.2, 1.4, .4, 1); }
+  @keyframes wlq_pop {
+    0%   { transform: scale(.4); opacity: 0; }
+    70%  { transform: scale(1.08); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* ===== 按钮区（iOS 授权 / 降级抽签） ===== */
+  .wlq_btn {
+    margin-top: 30px;
+    padding: 13px 36px;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: #1a2340;
+    background: linear-gradient(135deg, #ffd166, #ffb347);
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(255,179,71,.35);
+  }
+  .wlq_btn:active { transform: scale(.96); }
+  .wlq_hidden { display: none; }
+
+  /* ===== 不支持提示 ===== */
+  .wlq_unsupport {
+    margin-top: 26px;
+    font-size: 14px;
+    color: #ff9d9d;
+    letter-spacing: 1px;
+  }
+
+  /* ===== 底部说明（为什么必须做降级） ===== */
+  .wlq_note {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    padding: 12px 22px calc(12px + env(safe-area-inset-bottom));
+    font-size: 11.5px;
+    line-height: 1.8;
+    color: rgba(255,255,255,.4);
+    text-align: left;
+    background: linear-gradient(transparent, rgba(0,0,0,.5));
+  }
+</style>
+</head>
+<body>
+
+  <div class="wlq_head">王柳晴 · 24002120127 · 任务四 摇一摇彩蛋</div>
+
+  <h1 class="wlq_title">今日吃什么？</h1>
+  <p class="wlq_hint">摇一摇手机，抽今日菜谱 📳</p>
+
+  <!-- 结果卡片 -->
+  <div class="wlq_card" id="wlq_card">
+    <p class="wlq_label">—— 今日菜谱 ——</p>
+    <div class="wlq_dish" id="wlq_dish">等 你 来 摇</div>
+    <div class="wlq_emoji" id="wlq_emoji">🍽️</div>
+    <p class="wlq_desc" id="wlq_desc">拿起手机摇一摇，菜谱马上揭晓</p>
+  </div>
+
+  <!-- 按钮：iOS 授权 / 桌面降级抽签 -->
+  <button class="wlq_btn" id="wlq_btn">点我抽一次</button>
+
+  <!-- 不支持提示 -->
+  <p class="wlq_unsupport wlq_hidden" id="wlq_unsupport">当前设备不支持，请用手机打开</p>
+
+  <!-- 底部说明：为什么必须做降级 -->
+  <p class="wlq_note">
+    为什么要做降级：加速度传感器并非所有设备都有——电脑普遍没有加速度计；iOS 13+ 出于隐私要求必须由用户点按授权
+    （DeviceMotionEvent.requestPermission）才会上报数据；部分安卓浏览器或非 HTTPS 环境也不触发 devicemotion。
+    若不降级，这些场景下页面会毫无反应甚至白屏。所以必须提供"点我抽一次"按钮兜底，保证功能在任何设备上都可用。
+  </p>
+
+<script>
+  /* ================= 变量一律以 wlq_ 开头 ================= */
+
+  var wlq_card      = document.getElementById("wlq_card");       // 结果卡片
+  var wlq_dishEl    = document.getElementById("wlq_dish");       // 菜名
+  var wlq_emojiEl   = document.getElementById("wlq_emoji");      // 图标
+  var wlq_descEl    = document.getElementById("wlq_desc");       // 描述
+  var wlq_btn       = document.getElementById("wlq_btn");        // 按钮
+  var wlq_unsupport = document.getElementById("wlq_unsupport");  // 不支持提示
+
+  var wlq_dishes = [   // 菜谱池
+    { name: "北京烤鸭", emoji: "🦆", desc: "皮脆肉嫩，卷饼蘸酱，今日硬菜非它莫属！" },
+    { name: "麻婆豆腐", emoji: "🌶️", desc: "麻辣鲜香烫，下饭一绝，小心烫嘴哦。" },
+    { name: "糖醋排骨", emoji: "🍖", desc: "酸甜红亮，外亮里嫩，快乐加倍的一道菜。" },
+    { name: "灌汤小笼包", emoji: "🥟", desc: "先开窗、后喝汤，鲜香满口不烫舌。" },
+    { name: "鱼香肉丝", emoji: "🐟", desc: "没有鱼的鱼香，咸甜酸辣平衡得刚刚好。" },
+    { name: "西红柿炒蛋", emoji: "🍅", desc: "国民家常菜，简单却永远吃不腻。" },
+    { name: "水煮鱼", emoji: "🐡", desc: "麻辣过瘾，鱼片嫩滑，无鱼不成席。" },
+    { name: "宫保鸡丁", emoji: "🥜", desc: "荔枝口小酸甜，花生酥脆，经典川味。" }
+  ];
+
+  var wlq_threshold = 18;        // 摇动判定阈值（合成加速度，含重力）
+  var wlq_cooldown  = 1500;      // 冷却 1.5s，防止一次摇动重复触发
+  var wlq_lastTime  = 0;         // 上一次触发时间戳
+  var wlq_armed     = true;      // 是否已"上膛"：触发后需加速度回落才允许再次触发
+  var wlq_supported = false;     // 是否收到过有效的传感器数据
+  var wlq_checkTimer = null;     // 检测超时的定时器
+
+  /* ---------- 抽菜谱 + 弹出动画 ---------- */
+  function wlq_draw() {
+    var pick = wlq_dishes[Math.floor(Math.random() * wlq_dishes.length)];
+    wlq_dishEl.textContent  = pick.name;
+    wlq_emojiEl.textContent = pick.emoji;
+    wlq_descEl.textContent  = pick.desc;
+    // 重新触发弹出动画：先移除 class，强制重排后再加回
+    wlq_card.classList.remove("wlq_pop");
+    void wlq_card.offsetWidth;
+    wlq_card.classList.add("wlq_pop");
+  }
+
+  /* ---------- 降级提示：显示"不支持" + 按钮变为抽签 ---------- */
+  function wlq_fallback() {
+    wlq_unsupport.classList.remove("wlq_hidden");
+    wlq_btn.textContent = "点我抽一次";
+    wlq_btn.onclick = wlq_draw;   // 按钮降级为随机抽签
+  }
+
+  /* ---------- 监听 devicemotion ---------- */
+  function wlq_onMotion(e) {
+    // 2. 取 accelerationIncludingGravity（含重力），计算三轴合成加速度
+    var acc = e.accelerationIncludingGravity;
+    if (!acc || typeof acc.x !== "number" || typeof acc.y !== "number" || typeof acc.z !== "number") {
+      return;   // 数据无效（桌面浏览器可能上报全 null），不算支持
+    }
+    wlq_supported = true;   // 收到过有效数据，取消"不支持"检测
+    clearTimeout(wlq_checkTimer);
+
+    // 合成加速度模长：√(x² + y² + z²)。含重力时静止平放约 9.8，摇动瞬间会冲过 18
+    var total = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
+
+    var now = Date.now();
+    // 3. 超过阈值 + 不在冷却期 + 已回落上膛 → 判定为一次摇动
+    if (total > wlq_threshold && now - wlq_lastTime > wlq_cooldown && wlq_armed) {
+      wlq_lastTime = now;
+      wlq_armed = false;          // 一次摇动只触发一次
+      wlq_draw();
+      // 冷却结束且加速度回落到阈值以下后重新上膛，迎接下一次摇动
+      setTimeout(function () { wlq_armed = true; }, wlq_cooldown);
+    }
+  }
+
+  /* ---------- 启动流程 ---------- */
+  function wlq_start() {
+    if (typeof DeviceMotionEvent === "undefined") {
+      // ② 没有加速度传感器的设备：直接降级，不报错不白屏
+      wlq_fallback();
+      return;
+    }
+
+    // ③ iOS 13+：必须由用户点按按钮触发权限申请
+    if (typeof DeviceMotionEvent.requestPermission === "function") {
+      wlq_btn.textContent = "开启摇一摇（传感器授权）";
+      wlq_btn.onclick = function () {
+        DeviceMotionEvent.requestPermission()
+          .then(function (state) {
+            if (state === "granted") {
+              window.addEventListener("devicemotion", wlq_onMotion);
+              wlq_btn.classList.add("wlq_hidden");   // 授权成功隐藏按钮
+              wlq_armCheck();
+            } else {
+              wlq_fallback();   // 用户拒绝授权 → 降级
+            }
+          })
+          .catch(function () { wlq_fallback(); });
+      };
+      return;
+    }
+
+    // 其他设备（安卓等）：直接监听，并做 2.5s 检测——收不到有效数据就降级
+    window.addEventListener("devicemotion", wlq_onMotion);
+    wlq_armCheck();
+  }
+
+  // 2.5s 内没收到有效 devicemotion 数据 → 判定不支持 → 降级
+  function wlq_armCheck() {
+    wlq_checkTimer = setTimeout(function () {
+      if (!wlq_supported) wlq_fallback();
+    }, 2500);
+  }
+
+  wlq_start();
+</script>
+</body>
+</html>
