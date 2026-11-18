@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>手势卡片：左右滑动切换内容 · 中华美食卡片</title>
+<!--
+  作者：王柳晴  学号：24002120127
+  建立时间：2026-11-18
+  使用大模型：GLM-5.3-Flash
+  功能名称：任务二 手势卡片——touchstart/touchend 识别左右滑动手势，横向位移阈值 40px，
+            左滑下一张、右滑上一张，边界提示 + 0.3s 过渡动画 + 300ms 冷却防连滑
+-->
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    background: #111318;
+    color: #fff;
+    overflow: hidden;
+  }
+
+  /* ===== 卡片舞台：占满全屏，touch-action: pan-y 保证纵向仍能滚动页面 ===== */
+  .wlq_stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    touch-action: pan-y;
+    overflow: hidden;
+  }
+
+  /* ===== 单张美食卡片（绝对定位叠放，靠 wlq_active 切换） ===== */
+  .wlq_card {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px 28px 110px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(60px) scale(.96);
+    transition: opacity .3s ease, transform .3s ease, visibility .3s;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .wlq_card.wlq_active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0) scale(1);
+    z-index: 2;
+  }
+  /* 滑出方向：下一张从右进 / 上一张从左进 */
+  .wlq_card.wlq_left { transform: translateX(-60px) scale(.96); }
+
+  /* 四道菜各自的渐变背景 */
+  .wlq_card.wlq_dish1 { background: linear-gradient(160deg, #c0392b, #8e1d12 60%, #5c0f08); }
+  .wlq_card.wlq_dish2 { background: linear-gradient(160deg, #d35400, #a04000 60%, #6e2c00); }
+  .wlq_card.wlq_dish3 { background: linear-gradient(160deg, #e67e22, #ba6b1a 60%, #7e4a0e); }
+  .wlq_card.wlq_dish4 { background: linear-gradient(160deg, #c2185b, #880e4f 60%, #560a31); }
+
+  .wlq_emoji { font-size: 92px; margin-bottom: 26px; filter: drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
+  .wlq_dish-name { font-size: 42px; letter-spacing: 6px; text-shadow: 0 3px 10px rgba(0,0,0,.3); }
+  .wlq_dish-sub { font-size: 15px; opacity: .85; letter-spacing: 3px; margin-top: 10px; }
+  .wlq_dish-desc {
+    margin-top: 24px;
+    max-width: 460px;
+    font-size: 16px;
+    line-height: 2;
+    opacity: .95;
+    background: rgba(0,0,0,.18);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 16px;
+    padding: 18px 24px;
+  }
+
+  /* ===== 边界提示文字 ===== */
+  .wlq_hint {
+    position: fixed;
+    top: 34px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-12px);
+    background: rgba(0,0,0,.65);
+    border: 1px solid rgba(255,255,255,.25);
+    color: #ffe08a;
+    font-size: 14px;
+    letter-spacing: 1px;
+    padding: 9px 22px;
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s, transform .3s;
+    z-index: 9;
+  }
+  .wlq_hint.wlq_show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ===== 底部：页码指示 ===== */
+  .wlq_footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 18px 0 calc(18px + env(safe-area-inset-bottom));
+    text-align: center;
+    background: linear-gradient(transparent, rgba(0,0,0,.5));
+    z-index: 5;
+  }
+  .wlq_counter { font-size: 15px; letter-spacing: 3px; }
+  .wlq_counter b { color: #ffd166; font-size: 19px; }
+  .wlq_dots { margin-top: 12px; display: flex; justify-content: center; gap: 9px; }
+  .wlq_dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: rgba(255,255,255,.35);
+    transition: background .3s, transform .3s;
+  }
+  .wlq_dot.wlq_on { background: #ffd166; transform: scale(1.25); }
+
+  /* ===== 顶部标题（姓名学号） ===== */
+  .wlq_topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    padding: 14px 18px;
+    text-align: center;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,.75);
+    background: linear-gradient(rgba(0,0,0,.4), transparent);
+    z-index: 5;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+  <div class="wlq_topbar">王柳晴 · 24002120127 · 左右滑动切换美食卡片</div>
+
+  <!-- 边界提示 -->
+  <div class="wlq_hint" id="wlq_hint">已经是第一张</div>
+
+  <!-- 卡片舞台 -->
+  <div class="wlq_stage" id="wlq_stage">
+
+    <div class="wlq_card wlq_dish1 wlq_active" id="wlq_card_1">
+      <div class="wlq_emoji">🦆</div>
+      <h1 class="wlq_dish-name">北京烤鸭</h1>
+      <p class="wlq_dish-sub">JING DUCK · 京菜之首</p>
+      <p class="wlq_dish-desc">果木挂炉烤制，皮脆如纸、肉嫩多汁。薄饼卷鸭片，佐以甜面酱与葱丝，一口尽是京城的醇厚风味。</p>
+    </div>
+
+    <div class="wlq_card wlq_dish2" id="wlq_card_2">
+      <div class="wlq_emoji">🌶️</div>
+      <h1 class="wlq_dish-name">麻婆豆腐</h1>
+      <p class="wlq_dish-sub">MAPO TOFU · 川菜经典</p>
+      <p class="wlq_dish-desc">豆腐雪白嫩滑，牛肉末酥香，花椒与豆瓣酱共舞。麻、辣、烫、香、酥、嫩、鲜、活，八字真味尽在盘中。</p>
+    </div>
+
+    <div class="wlq_card wlq_dish3" id="wlq_card_3">
+      <div class="wlq_emoji">🍖</div>
+      <h1 class="wlq_dish-name">糖醋排骨</h1>
+      <p class="wlq_dish-sub">SWEET &amp; SOUR RIBS · 本帮风味</p>
+      <p class="wlq_dish-desc">排骨焯水后文火慢煨，收汁时糖醋交融，色泽红亮油润。酸甜适口、外亮里嫩，是餐桌上的百吃不厌。</p>
+    </div>
+
+    <div class="wlq_card wlq_dish4" id="wlq_card_4">
+      <div class="wlq_emoji">🥟</div>
+      <h1 class="wlq_dish-name">灌汤小笼包</h1>
+      <p class="wlq_dish-sub">XIAOLONGBAO · 江南点心</p>
+      <p class="wlq_dish-desc">十八道褶捏出薄如蝉翼的皮，馅料秘制皮冻，蒸后化汤。轻轻提起慢慢移，先开窗后喝汤，鲜香满口。</p>
+    </div>
+
+  </div>
+
+  <!-- 底部页码 -->
+  <div class="wlq_footer">
+    <div class="wlq_counter">第 <b id="wlq_current">1</b> / <span id="wlq_total">4</span> 张</div>
+    <div class="wlq_dots" id="wlq_dots">
+      <span class="wlq_dot wlq_on"></span>
+      <span class="wlq_dot"></span>
+      <span class="wlq_dot"></span>
+      <span class="wlq_dot"></span>
+    </div>
+  </div>
+
+<script>
+  /* ===== 变量一律以 wlq_ 开头 ===== */
+  var wlq_cards     = document.querySelectorAll(".wlq_card");   // 全部卡片
+  var wlq_dots      = document.querySelectorAll(".wlq_dot");    // 底部圆点
+  var wlq_hint      = document.getElementById("wlq_hint");      // 边界提示
+  var wlq_currentEl = document.getElementById("wlq_current");   // 当前页码
+  var wlq_index     = 0;        // 当前卡片下标（0 ~ 3）
+  var wlq_total     = wlq_cards.length;
+  var wlq_startX    = 0;        // touchstart 起点 X
+  var wlq_threshold = 40;       // 横向位移阈值 40px
+  var wlq_cooldown  = 300;      // 冷却 300ms，防止快速连滑一次跳两张
+  var wlq_lastTime  = 0;        // 上一次成功切换的时间戳
+  var wlq_hintTimer = null;     // 提示消失的定时器
+
+  document.getElementById("wlq_total").textContent = wlq_total;
+
+  /* 切换到指定下标的卡片（带 0.3s 过渡动画，见 CSS transition） */
+  function wlq_goTo(idx) {
+    // 先给当前卡片记录滑出方向，让下一张从对应方向进入
+    var old = wlq_cards[wlq_index];
+    if (idx > wlq_index)      old.classList.add("wlq_left");
+    else if (idx < wlq_index) old.classList.remove("wlq_left");
+
+    wlq_cards[wlq_index].classList.remove("wlq_active");
+    wlq_index = idx;
+    wlq_cards[wlq_index].classList.add("wlq_active");
+
+    // 更新页码与圆点
+    wlq_currentEl.textContent = wlq_index + 1;
+    for (var i = 0; i < wlq_dots.length; i++) {
+      wlq_dots[i].classList.toggle("wlq_on", i === wlq_index);
+    }
+  }
+
+  /* 显示边界提示文字，1.2s 后自动淡出 */
+  function wlq_showHint(text) {
+    wlq_hint.textContent = text;
+    wlq_hint.classList.add("wlq_show");
+    clearTimeout(wlq_hintTimer);
+    wlq_hintTimer = setTimeout(function () {
+      wlq_hint.classList.remove("wlq_show");
+    }, 1200);
+  }
+
+  var wlq_stage = document.getElementById("wlq_stage");
+
+  /* ===== 手势识别：touchstart 记录起点 ===== */
+  wlq_stage.addEventListener("touchstart", function (e) {
+    wlq_startX = e.changedTouches[0].clientX;   // 用 changedTouches[0] 取起点
+  }, { passive: true });
+
+  /* ===== touchend 计算横向位移，判定左滑 / 右滑 ===== */
+  wlq_stage.addEventListener("touchend", function (e) {
+    var endX = e.changedTouches[0].clientX;    // 用 changedTouches[0] 取终点
+    var dx  = endX - wlq_startX;                // 横向位移（负 = 左滑，正 = 右滑）
+
+    // ① 位移未达到阈值 40px → 不切换（阈值生效）
+    if (Math.abs(dx) < wlq_threshold) return;
+
+    // ② 300ms 冷却期内 → 不切换（快速连续滑动不会一次跳两张）
+    var now = Date.now();
+    if (now - wlq_lastTime < wlq_cooldown) return;
+
+    if (dx < 0) {
+      // 左滑 → 下一张
+      if (wlq_index < wlq_total - 1) {
+        wlq_goTo(wlq_index + 1);
+        wlq_lastTime = now;
+      } else {
+        wlq_showHint("已经是最后一张");
+      }
+    } else {
+      // 右滑 → 上一张
+      if (wlq_index > 0) {
+        wlq_goTo(wlq_index - 1);
+        wlq_lastTime = now;
+      } else {
+        wlq_showHint("已经是第一张");
+      }
+    }
+  }, { passive: true });
+</script>
+</body>
+</html>

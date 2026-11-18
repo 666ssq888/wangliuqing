@@ -190,3 +190,83 @@ gitee私人令牌 （已脱敏，现存放于 Windows 凭据管理器）
 **执行说明：** ① 按用户更正重做：恢复原四任务（章节/演示台/要求卡/原 JS）完整内容，进阶三任务全部改为增补方式——四个演示台各追加爱达·魔都号 slide、演示四追加第 7 个 creative 按钮、新增进1/进2/进3 章节与 AI 对话记录板块；浏览器实测 4 轮播全部初始化、24 个 slide、creative/slide 切换与方向键翻页正常。② 按 commit-github skill 提交：swiper-task.html、swiper-imgs/aida_1.jpg、wlq_prompt.md → push 到 github.com/666ssq888/wangliuqing。
 
 ---
+
+## 2026-11-11 14:05 | 模型：GLM-5.3-Flash
+
+**提示词内容：**
+
+发布到 github pages
+
+**执行说明：** 同步 gh-pages 快照：克隆 gh-pages 分支 → 覆盖更新 24002120127_王柳晴/index.html/ 全部站点文件（含进阶版 swiper-task.html）→ 新增根级 swiper-imgs/（保证页面里 ../swiper-imgs/ 相对路径在站点上生效）→ commit 并 push gh-pages → 线上验证首页与 swiper-task.html 及 aida_1.jpg 均可访问。
+
+---
+
+## 2026-11-13 14:02 | 模型：GLM-5.3-Flash
+
+**提示词内容：**
+
+（课堂练习，先后三张截图对应步骤 3-6）③ 在 db 文件夹执行 npm init -y 与 npm install express；④ 看清 db.json 最外层 poems 数组；⑤ 终端 node server.js 启动，看到「数据服务器已启动: http://localhost:3004/api/poems」；⑥ 浏览器访问该地址验证 JSON。随后正式提示词：给我新建一个html文件，显示上图下文的结构，图片和文字通过本地启动服务器获取当前文件夹下面的db里面db.json的poems里面的图片，title和content。并给我生成server.js数据服务器文件，server.js放在db文件夹中。其中端口号为3004。
+
+**执行说明：** ① 步骤 3-6：因本机无 Node.js，安装便携版 v22.23.5 至用户目录并写入用户 PATH；npm init -y 生成 package.json、npm install express（^5.3.0）；创建 db/server.js（3004 端口，GET /api/poems 返回 poems 数组，wlq_ 前缀+姓名注释）；启动并 HTTP 验证返回 4 首诗 JSON。② 新建 index.html/poems.html：上图下文卡片栅格，fetch('http://localhost:3004/api/poems') 渲染图片/title/content；③ server.js 增加跨域响应头以便静态页面跨端口 fetch，重启服务器；④ 首页导航加入口；⑤ 启动静态服务器浏览器实测卡片渲染。
+
+---
+
+## 2026-11-13 14:13 | 模型：GLM-5.3-Flash
+
+**提示词内容：**
+
+执行最后的三步（截图步骤 9-11）：⑨ 写 fetch 即时调试——F12 控制台先 console.log(res) 确认拿到数组，再写渲染逻辑；⑩ 改数据看页面自动变——改 db.json 一条 content，保存后停止服务再 node server.js 重启，刷新网页看到新内容（服务器只在启动时读一次文件）；⑪ 停止/重开服务——遇 EADDRINUSE 端口被占用说明上次没停干净，先停止或改 wy_port=3005 并同步改 fetch 地址。
+
+**执行说明：** ① 步骤 9：poems.html 在 fetch 拿到数组后、渲染前加两条调试 console.log（返回数组、长度与首条 title）；② 步骤 10：db.json「雨晴」content 追加「（步骤10：这条内容已改，页面应跟着变）」（用户此前已把「短歌行」改为「你看是不是变了！」），停 3004 端口进程并 node server.js 重启，接口实测返回新内容；③ 步骤 11：演示端口占用处理——Get-NetTCPConnection 找到占用 3004 的 node 进程（PID 19844）停止后重启；④ 浏览器最终验证三项全 PASS：控制台调试日志出现且长度=4、雨晴卡片显示更新后文本、tip 显示加载成功 4 张。
+
+---
+
+## 2026-11-18 13:43 | 模型：GLM-5.3-Flash
+
+**提示词内容：**
+
+严格按照图片要求完成任务二，遵循我原先制定好的命名规则（任务二：手势卡片 左右滑动切换内容，新建 mobile-gesture.html）
+
+**执行说明：** 新建 index.html/mobile-gesture.html：全屏中华美食卡片 4 道（菜名/简介/渐变背景/底部"第 X / 4 张"页码与圆点）；touchstart/touchend 用 changedTouches[0] 计算横向位移，阈值 40px；左滑下一张、右滑上一张，边界提示"已经是第一张/最后一张"；容器 touch-action: pan-y；0.3s 过渡动画 + 300ms 冷却防连滑跳两张。
+
+---
+
+## 2026-11-18 13:46 | 模型：GLM-5.3-Flash
+
+**提示词内容：**
+
+一律是以wlq_命名的
+
+**执行说明：** 将 mobile-gesture.html 中全部类名/id/JS 变量由 wy_ 统一改为 wlq_ 前缀，grep 校验无残留。
+
+---
+
+## 2026-11-18 13:47 | 模型：GLM-5.3-Flash
+
+**提示词内容：**
+
+按照图片要求完成任务三，所有变量以wlq_命名（任务三：图片查看器 双指缩放+双击放大+拖动，新建 mobile-zoom.html）
+
+**执行说明：** 新建 index.html/mobile-zoom.html：容器 overflow:hidden/touch-action:none/user-select:none；touchstart 记录单双指状态与双指初始距离及快照；touchmove 按距离比例缩放 1~4 倍、以两指中点为不动点（快照+不动点公式保证缩放不跳变）；单指拖动实时夹回边界（1x 位移范围为 0 拖不出边界）；双击自定义判定切换 1x↔2x 带 0.25s 过渡、缩回 1x 自动居中；resize/orientationchange 重校准不丢状态；页面顶部提示"双指缩放请用手机打开"。
+
+---
+
+## 2026-11-18 13:52 | 模型：GLM-5.3-Flash
+
+**提示词内容：**
+
+读取图片要求完成任务四，wlq_命名（任务四：摇一摇彩蛋 A 方案，新建 mobile-sensor.html）
+
+**执行说明：** 新建 index.html/mobile-sensor.html：监听 devicemotion，用 accelerationIncludingGravity 三轴合成加速度 √(x²+y²+z²)，阈值 18 判定摇动；1.5s 冷却 + 回落再上膛防一次摇动重复触发；随机抽 8 道菜带弹出动画；三层降级（无 API / iOS 13+ requestPermission 点按授权 / 2.5s 收不到有效数据→显示"当前设备不支持，请用手机打开" + "点我抽一次"按钮）；页面底部附为什么必须做降级的说明。
+
+---
+
+## 2026-11-18 13:55 | 模型：GLM-5.3-Flash
+
+**提示词内容：**
+
+将今天新增的文件上传到GitHub并发布获取发布链接，可在手机浏览器打开并进行测试
+
+**执行说明：** ① 追加本提示词记录；② master 分支提交 mobile-gesture.html、mobile-zoom.html、mobile-sensor.html、poems.html（补齐首页导航入口）及 index.html/wlq_prompt.md，push 到 github.com/666ssq888/wangliuqing；③ 同步 gh-pages 快照（覆盖 24002120127_王柳晴/index.html/ 站点文件）→ push → 线上验证三个移动端页面 URL 可访问（GitHub Pages 为 HTTPS，devicemotion/触摸事件可在真机浏览器直接测试）。
+
+---

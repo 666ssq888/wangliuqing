@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>诗词光影卡片 · 上图下文</title>
+<!--
+  作者：王柳晴
+  建立时间：2026-11-13 14:02
+  使用大模型：GLM-5.3-Flash
+  功能名称：上图下文诗词卡片页——通过 fetch 请求本地数据服务器（db/server.js，端口 3004）的 /api/poems 接口，
+           渲染 db.json 中 poems 数组的图片（pic）、标题（title）与内容（content）
+-->
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;background:#f3f6fb;color:#1f2937}
+  .wlq-wrap{max-width:1100px;margin:0 auto;padding:40px 20px 60px}
+
+  /* 页头 */
+  .wlq-head{background:linear-gradient(135deg,#0f2b5b,#1d5bbf);border-radius:20px;padding:30px 34px;color:#fff;margin-bottom:12px;box-shadow:0 12px 30px rgba(15,43,91,.3)}
+  .wlq-head .wlq-badge{display:inline-block;padding:5px 14px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);font-size:13px;letter-spacing:2px;margin-bottom:12px}
+  .wlq-head h1{font-size:26px;letter-spacing:1px}
+  .wlq-head h1 b{color:#ffd166}
+  .wlq-head p{margin-top:10px;font-size:14px;color:#d9e3f5;line-height:2}
+  .wlq-head code{background:rgba(255,255,255,.14);padding:1px 8px;border-radius:5px;font-family:Consolas,monospace;font-size:13px;color:#ffe8a3}
+
+  /* 卡片栅格：上图下文 */
+  .wlq-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;margin-top:22px}
+  .wlq-card{background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e8ecf5;box-shadow:0 4px 14px rgba(31,41,55,.08);transition:transform .2s,box-shadow .2s}
+  .wlq-card:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(15,43,91,.16)}
+  .wlq-card .wlq-img{width:100%;height:170px;object-fit:cover;display:block;background:#e5eaf3}
+  .wlq-card .wlq-body{padding:14px 16px 18px}
+  .wlq-card h2{font-size:17px;color:#0f2b5b;letter-spacing:1px;border-left:4px solid #e8890c;padding-left:10px}
+  .wlq-card p{margin-top:10px;font-size:13.5px;color:#4b5563;line-height:1.9}
+
+  /* 状态提示 */
+  .wlq-tip{margin-top:22px;text-align:center;font-size:14px;color:#9ca3af;line-height:2}
+  .wlq-tip.wlq-err{color:#dc2626}
+
+  .wlq-back{text-align:center;margin-top:30px}
+  .wlq-back a{display:inline-block;text-decoration:none;color:#0f2b5b;font-size:14.5px;font-weight:bold;background:#fff;border:1px solid #dbe4ff;border-radius:999px;padding:10px 26px;transition:transform .2s,box-shadow .2s}
+  .wlq-back a:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(15,43,91,.15)}
+
+  footer{text-align:center;margin-top:30px;color:#9ca3af;font-size:13px;line-height:2}
+</style>
+</head>
+<body>
+<div class="wlq-wrap">
+
+  <div class="wlq-head">
+    <span class="wlq-badge">高 职 · 高 级 网 页 设 计 · 数 据 接 口 实 践</span>
+    <h1>诗词光影卡片 · <b>上图下文</b></h1>
+    <p>页面数据来自本地数据服务器 <code>http://localhost:3004/api/poems</code>（db/server.js 读取当前文件夹 db 子目录下 db.json 的 poems 数组），图片（pic）、标题（title）、内容（content）均由接口返回后动态渲染。</p>
+  </div>
+
+  <!-- 卡片容器：上图下文结构由 JS 动态生成 -->
+  <main id="wlq_cards" class="wlq-cards" aria-live="polite"></main>
+  <p class="wlq-tip" id="wlq_tip">正在请求本地数据服务器……（请确认已运行 node server.js）</p>
+
+  <div class="wlq-back"><a href="index.html">← 返回首页</a></div>
+
+  <footer>诗词光影卡片 · 上图下文 · 高级网页设计 · 24002120127 王柳晴</footer>
+</div>
+
+<script>
+  // ── 常量：数据服务器接口地址（db/server.js 提供，端口 3004）──
+  var wlq_api = 'http://localhost:3004/api/poems';
+
+  // 功能：请求 /api/poems 接口，把返回的 poems 数组渲染成上图下文卡片（王柳晴）
+  async function wlq_loadPoems() {
+    var wlq_box = document.getElementById('wlq_cards');
+    var wlq_tip = document.getElementById('wlq_tip');
+    try {
+      // ① 请求本地数据服务器，获取 poems 数组
+      var wlq_resp = await fetch(wlq_api);
+      var wlq_poems = await wlq_resp.json();
+
+      // 步骤 9 调试：先在控制台确认拿到数组，再写渲染逻辑（F12 查看）
+      console.log('步骤9调试 · /api/poems 返回：', wlq_poems);
+      console.log('步骤9调试 · 数组长度 =', wlq_poems.length, '，第一条 title =', wlq_poems[0].title);
+
+      // ② 拼接上图下文卡片结构：上面图片（pic），下面标题（title）与内容（content）
+      var wlq_html = '';
+      wlq_poems.forEach(function (wlq_p) {
+        wlq_html +=
+          '<article class="wlq-card">' +
+            '<img class="wlq-img" src="' + wlq_p.pic + '" alt="' + wlq_p.title + '">' +
+            '<div class="wlq-body">' +
+              '<h2>' + wlq_p.title + '</h2>' +
+              '<p>' + wlq_p.content + '</p>' +
+            '</div>' +
+          '</article>';
+      });
+
+      // ③ 渲染卡片并显示成功提示
+      wlq_box.innerHTML = wlq_html;
+      wlq_tip.textContent = '✅ 加载成功：共渲染 ' + wlq_poems.length + ' 张诗词卡片（数据来自 /api/poems）';
+    } catch (wlq_err) {
+      // 服务器未启动或接口异常时给出提示
+      wlq_tip.className = 'wlq-tip wlq-err';
+      wlq_tip.textContent = '❌ 加载失败：' + wlq_err.message + '（请先在 db 文件夹运行 node server.js，再刷新本页）';
+    }
+  }
+
+  wlq_loadPoems();
+</script>
+</body>
+</html>
