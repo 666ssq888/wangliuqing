@@ -71,6 +71,57 @@
     pointer-events: none;
   }
   .wlq_status b { color: #ffd166; font-size: 18px; }
+
+  /* ===== 演示视频：右上角按钮 + 全屏浮层播放器 ===== */
+  .wlq_videobtn {
+    position: fixed;
+    top: calc(52px + env(safe-area-inset-top));
+    right: 14px;
+    z-index: 20;
+    padding: 9px 18px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: #1a2340;
+    background: linear-gradient(135deg, #ffd166, #ffb347);
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(255,179,71,.4);
+  }
+  .wlq_videobtn:active { transform: scale(.95); }
+
+  .wlq_video-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: rgba(0,0,0,.88);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .wlq_video-layer.wlq_open { display: flex; }
+  .wlq_video-title { font-size: 15px; letter-spacing: 2px; color: #ffe08a; margin-bottom: 14px; }
+  .wlq_video {
+    width: 100%;
+    max-width: 640px;
+    max-height: 72vh;
+    border-radius: 14px;
+    background: #000;
+    box-shadow: 0 12px 40px rgba(0,0,0,.6);
+  }
+  .wlq_videoclose {
+    margin-top: 20px;
+    padding: 10px 34px;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: #fff;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 999px;
+    cursor: pointer;
+  }
 </style>
 </head>
 <body>
@@ -87,6 +138,17 @@
 
   <!-- 状态栏 -->
   <div class="wlq_status">当前倍数：<b id="wlq_zoom">1.0</b>x</div>
+
+  <!-- 演示视频按钮 -->
+  <button class="wlq_videobtn" id="wlq_videobtn">▶ 操作演示视频</button>
+
+  <!-- 演示视频浮层 -->
+  <div class="wlq_video-layer" id="wlq_video_layer">
+    <p class="wlq_video-title">—— 双指缩放 · 双击放大 · 单指拖动 操作演示 ——</p>
+    <video class="wlq_video" id="wlq_video" src="zoom-imgs/wlq_demo.mp4"
+           controls playsinline preload="metadata"></video>
+    <button class="wlq_videoclose" id="wlq_videoclose">关闭视频</button>
+  </div>
 
 <script>
   /* ================= 变量一律以 wlq_ 开头 ================= */
@@ -319,6 +381,18 @@
   /* 初始化 */
   wlq_measure();
   wlq_apply();
+
+  /* ---------- 演示视频浮层：打开 / 关闭（关闭时暂停播放） ---------- */
+  var wlq_videoLayer = document.getElementById("wlq_video_layer");
+  var wlq_videoEl    = document.getElementById("wlq_video");
+
+  document.getElementById("wlq_videobtn").addEventListener("click", function () {
+    wlq_videoLayer.classList.add("wlq_open");
+  });
+  document.getElementById("wlq_videoclose").addEventListener("click", function () {
+    wlq_videoEl.pause();
+    wlq_videoLayer.classList.remove("wlq_open");
+  });
 </script>
 </body>
 </html>
